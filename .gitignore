@@ -1,0 +1,116 @@
+# =========================
+# Node.js
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+coverage/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checking
+.mypy_cache/
+.pyre/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# =========================
+# IDE & Editor Files
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Cache & Temporary Files
+# =========================
+.cache/
+.temp/
+tmp/
+temp/
+
+# =========================
+# Runtime Files
+# =========================
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# HTML/CSS Build Tools
+# =========================
+.sass-cache/
+.parcel-cache/
+
+# =========================
+# Secrets & Certificates
+# =========================
+*.pem
+*.key
+*.crt
+*.p12
+
+# =========================
+# Miscellaneous
+# =========================
+coverage/
+*.tgz
+
+# AWS Access keys and credentials
+Life-Tech-Journal_credentials.csv
+Life-Tech-Journal_accessKeys.csv
+
+client_secret_*.json
