@@ -58,7 +58,7 @@ export default function AIExcerptGenerator({ title, content, onApply }: Props) {
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:1000,
           display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}
           onClick={e=>{ if(e.target===e.currentTarget) setOpen(false); }}>
-          <div style={{ background:"white", borderRadius:20, padding:32, maxWidth:560, width:"100%",
+          <div style={{ background:"var(--card)", borderRadius:20, padding:32, maxWidth:560, width:"100%",
             boxShadow:"0 20px 60px rgba(0,0,0,0.2)" }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
@@ -66,20 +66,20 @@ export default function AIExcerptGenerator({ title, content, onApply }: Props) {
                   background:"linear-gradient(135deg,#4F46E5,#7C3AED)",
                   display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>✨</div>
                 <div>
-                  <div style={{ fontWeight:700, fontSize:15, color:"#1A1A1A" }}>AI Excerpt Generator</div>
-                  <div style={{ fontSize:11, color:"#A0A0A0" }}>Powered by Ollama · {loading ? "Generating…" : "Ready"}</div>
+                  <div style={{ fontWeight:700, fontSize:15, color:"var(--ink)" }}>AI Excerpt Generator</div>
+                  <div style={{ fontSize:11, color:"var(--ink-light)" }}>Powered by Ollama · {loading ? "Generating…" : "Ready"}</div>
                 </div>
               </div>
               <button onClick={()=>setOpen(false)}
-                style={{ background:"#F0EDE8", border:"none", borderRadius:"50%", width:28, height:28,
+                style={{ background:"var(--border-light)", border:"none", borderRadius:"50%", width:28, height:28,
                   cursor:"pointer", fontSize:14 }}>✕</button>
             </div>
 
             {loading ? (
               <div style={{ padding:"32px 0", textAlign:"center" }}>
-                <div style={{ width:36, height:36, border:"3px solid #E8E4DE", borderTopColor:"#4F46E5",
+                <div style={{ width:36, height:36, border:"3px solid var(--border)", borderTopColor:"#4F46E5",
                   borderRadius:"50%", animation:"spin 0.8s linear infinite", margin:"0 auto 14px" }} />
-                <div style={{ color:"#A0A0A0", fontSize:13 }}>Analyzing your article content…</div>
+                <div style={{ color:"var(--ink-light)", fontSize:13 }}>Analyzing your article content…</div>
                 <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
               </div>
             ) : error ? (
@@ -96,22 +96,22 @@ export default function AIExcerptGenerator({ title, content, onApply }: Props) {
                   <div key={key}>
                     <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
                       <label style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
-                        letterSpacing:"0.07em", color:"#6B6B6B" }}>{label}</label>
-                      <span style={{ fontSize:11, color:"#A0A0A0" }}>{result[key]?.length} chars</span>
+                        letterSpacing:"0.07em", color:"var(--ink-muted)" }}>{label}</label>
+                      <span style={{ fontSize:11, color:"var(--ink-light)" }}>{result[key]?.length} chars</span>
                     </div>
                     <textarea readOnly value={result[key]} rows={rows}
                       style={{ width:"100%", padding:"10px 12px", borderRadius:9,
-                        border:"1.5px solid #E8E4DE", fontSize:13, fontFamily:"inherit",
-                        color:"#1A1A1A", resize:"none", background:"#F8FAFC", lineHeight:1.6 }} />
+                        border:"1.5px solid var(--border)", fontSize:13, fontFamily:"inherit",
+                        color:"var(--ink)", resize:"none", background:"var(--surface-2)", lineHeight:1.6 }} />
                   </div>
                 ))}
                 {result.keywords?.length > 0 && (
                   <div>
                     <label style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
-                      letterSpacing:"0.07em", color:"#6B6B6B", display:"block", marginBottom:8 }}>Keywords</label>
+                      letterSpacing:"0.07em", color:"var(--ink-muted)", display:"block", marginBottom:8 }}>Keywords</label>
                     <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                       {result.keywords.map((k: string) => (
-                        <span key={k} style={{ background:"#EEF2FF", color:"#4F46E5",
+                        <span key={k} style={{ background:"var(--primary-light)", color:"var(--primary-text)",
                           fontSize:11, padding:"3px 10px", borderRadius:100, fontWeight:600 }}>{k}</span>
                       ))}
                     </div>
@@ -125,8 +125,8 @@ export default function AIExcerptGenerator({ title, content, onApply }: Props) {
                     ✅ Apply to Article
                   </button>
                   <button onClick={generate}
-                    style={{ padding:"11px 18px", background:"#F8FAFC", color:"#374151",
-                      border:"1.5px solid #E8E4DE", borderRadius:10, fontWeight:600,
+                    style={{ padding:"11px 18px", background:"var(--surface-2)", color:"var(--ink-mid)",
+                      border:"1.5px solid var(--border)", borderRadius:10, fontWeight:600,
                       fontSize:13, cursor:"pointer", fontFamily:"inherit" }}>
                     🔄 Regenerate
                   </button>

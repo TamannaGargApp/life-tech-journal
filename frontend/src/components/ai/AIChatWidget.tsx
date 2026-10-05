@@ -122,7 +122,7 @@ export default function AIChatWidget() {
       {/* Chat window */}
       {open && (
         <div style={{ position:"fixed", bottom:24, right:24, zIndex:1000,
-          width:380, height:560, background:"white", borderRadius:20,
+          width:380, height:560, background:"var(--card)", borderRadius:20,
           boxShadow:"0 20px 60px rgba(0,0,0,0.2)", display:"flex",
           flexDirection:"column", overflow:"hidden", fontFamily:"Lato,sans-serif" }}>
 
@@ -175,12 +175,12 @@ export default function AIChatWidget() {
                 {msg.sources && msg.sources.length > 0 && (
                   <div style={{ marginTop:8, display:"flex", flexDirection:"column", gap:5, width:"100%" }}>
                     <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase",
-                      letterSpacing:"0.07em", color:"#A0A0A0" }}>Related Articles</div>
+                      letterSpacing:"0.07em", color:"var(--ink-light)" }}>Related Articles</div>
                     {msg.sources.map((s:any) => (
                       <a key={s.slug} href={`/blog/${s.slug}`}
-                        style={{ fontSize:12, color:"#4F46E5", textDecoration:"none", fontWeight:600,
-                          background:"#EEF2FF", padding:"6px 10px", borderRadius:8,
-                          display:"block", border:"1px solid #C7D2FE" }}>
+                        style={{ fontSize:12, color:"var(--primary-text)", textDecoration:"none", fontWeight:600,
+                          background:"var(--primary-light)", padding:"6px 10px", borderRadius:8,
+                          display:"block", border:"1px solid var(--primary-border)" }}>
                         📄 {s.title}
                       </a>
                     ))}
@@ -193,14 +193,14 @@ export default function AIChatWidget() {
             {messages.length === 1 && (
               <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                 <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase",
-                  letterSpacing:"0.07em", color:"#A0A0A0" }}>Try asking</div>
+                  letterSpacing:"0.07em", color:"var(--ink-light)" }}>Try asking</div>
                 {SUGGESTIONS.map(s => (
                   <button key={s} onClick={()=>{ setInput(s); setTimeout(()=>send(),50); }}
-                    style={{ textAlign:"left", padding:"8px 12px", background:"#F8FAFC",
-                      border:"1px solid #E8E4DE", borderRadius:8, fontSize:12, cursor:"pointer",
-                      fontFamily:"inherit", color:"#374151", transition:"all 0.1s" }}
-                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background="#EEF2FF"}}
-                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background="#F8FAFC"}}>
+                    style={{ textAlign:"left", padding:"8px 12px", background:"var(--surface-2)",
+                      border:"1px solid var(--border)", borderRadius:8, fontSize:12, cursor:"pointer",
+                      fontFamily:"inherit", color:"var(--ink-mid)", transition:"all 0.1s" }}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background="var(--primary-light)"}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background="var(--surface-2)"}}>
                     {s}
                   </button>
                 ))}
@@ -210,17 +210,17 @@ export default function AIChatWidget() {
           </div>
 
           {/* Input */}
-          <div style={{ padding:"12px 16px", borderTop:"1px solid #F0EDE8",
+          <div style={{ padding:"12px 16px", borderTop:"1px solid var(--border-light)",
             display:"flex", gap:8, alignItems:"center" }}>
             <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
               onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
               placeholder="Ask about articles…" disabled={loading}
               style={{ flex:1, padding:"9px 14px", borderRadius:10,
-                border:"1.5px solid #E8E4DE", outline:"none", fontSize:13,
-                fontFamily:"inherit", color:"#1A1A1A" }} />
+                border:"1.5px solid var(--border)", outline:"none", fontSize:13,
+                fontFamily:"inherit", color:"var(--ink)" }} />
             <button onClick={send} disabled={loading||!input.trim()}
               style={{ width:38, height:38, borderRadius:10,
-                background: input.trim()&&!loading ? "linear-gradient(135deg,#4F46E5,#14B8A6)" : "#F0EDE8",
+                background: input.trim()&&!loading ? "linear-gradient(135deg,#4F46E5,#14B8A6)" : "var(--border-light)",
                 border:"none", cursor: input.trim()&&!loading ? "pointer" : "not-allowed",
                 color: input.trim()&&!loading ? "white" : "#A0A0A0",
                 fontSize:16, display:"flex", alignItems:"center", justifyContent:"center",

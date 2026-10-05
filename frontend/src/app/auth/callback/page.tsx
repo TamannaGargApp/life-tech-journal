@@ -17,8 +17,8 @@ function CallbackContent() {
 
   return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100vh", fontFamily:"Lato,sans-serif", flexDirection:"column", gap:16 }}>
-      <div style={{ width:40, height:40, border:"3px solid #E8E4DE", borderTopColor:"#4F46E5", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
-      <p style={{ color:"#6B6B6B", fontSize:15 }}>Signing you in…</p>
+      <div style={{ width:40, height:40, border:"3px solid var(--border)", borderTopColor:"#4F46E5", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
+      <p style={{ color:"var(--ink-muted)", fontSize:15 }}>Signing you in…</p>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );

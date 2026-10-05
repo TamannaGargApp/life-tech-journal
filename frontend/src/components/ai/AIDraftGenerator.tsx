@@ -59,8 +59,8 @@ export default function AIDraftGenerator({ onApply }: Props) {
     };
 
     const inp: React.CSSProperties = {
-        width: "100%", padding: "9px 12px", borderRadius: 9, border: "1.5px solid #E8E4DE",
-        outline: "none", fontSize: 13, fontFamily: "inherit", color: "#1A1A1A",
+        width: "100%", padding: "9px 12px", borderRadius: 9, border: "1.5px solid var(--border)",
+        outline: "none", fontSize: 13, fontFamily: "inherit", color: "var(--ink)",
     };
 
     return (
@@ -82,7 +82,7 @@ export default function AIDraftGenerator({ onApply }: Props) {
                 }}
                     onClick={e => { if (e.target === e.currentTarget) setOpen(false); }}>
                     <div style={{
-                        background: "white", borderRadius: 20, padding: 32, width: "100%", maxWidth: 680,
+                        background: "var(--card)", borderRadius: 20, padding: 32, width: "100%", maxWidth: 680,
                         maxHeight: "90vh", overflow: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)"
                     }}>
 
@@ -94,13 +94,13 @@ export default function AIDraftGenerator({ onApply }: Props) {
                                     display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18
                                 }}>🤖</div>
                                 <div>
-                                    <div style={{ fontWeight: 700, fontSize: 16, color: "#1A1A1A" }}>AI Draft Generator</div>
-                                    <div style={{ fontSize: 11, color: "#A0A0A0" }}>Powered by Ollama Mistral</div>
+                                    <div style={{ fontWeight: 700, fontSize: 16, color: "var(--ink)" }}>AI Draft Generator</div>
+                                    <div style={{ fontSize: 11, color: "var(--ink-light)" }}>Powered by Ollama Mistral</div>
                                 </div>
                             </div>
                             <button onClick={() => setOpen(false)}
                                 style={{
-                                    background: "#F0EDE8", border: "none", borderRadius: "50%", width: 30, height: 30,
+                                    background: "var(--border-light)", border: "none", borderRadius: "50%", width: 30, height: 30,
                                     cursor: "pointer", fontSize: 14
                                 }}>✕</button>
                         </div>
@@ -110,7 +110,7 @@ export default function AIDraftGenerator({ onApply }: Props) {
                             <div style={{ gridColumn: "1/-1" }}>
                                 <label style={{
                                     fontSize: 11, fontWeight: 700, textTransform: "uppercase",
-                                    letterSpacing: "0.07em", color: "#6B6B6B", display: "block", marginBottom: 5
+                                    letterSpacing: "0.07em", color: "var(--ink-muted)", display: "block", marginBottom: 5
                                 }}>Article Title *</label>
                                 <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                                     placeholder="e.g. 10 Productivity Habits of Top Engineers"
@@ -119,7 +119,7 @@ export default function AIDraftGenerator({ onApply }: Props) {
                             <div>
                                 <label style={{
                                     fontSize: 11, fontWeight: 700, textTransform: "uppercase",
-                                    letterSpacing: "0.07em", color: "#6B6B6B", display: "block", marginBottom: 5
+                                    letterSpacing: "0.07em", color: "var(--ink-muted)", display: "block", marginBottom: 5
                                 }}>Category</label>
                                 <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                                     style={{ ...inp, cursor: "pointer" }}>
@@ -129,7 +129,7 @@ export default function AIDraftGenerator({ onApply }: Props) {
                             <div>
                                 <label style={{
                                     fontSize: 11, fontWeight: 700, textTransform: "uppercase",
-                                    letterSpacing: "0.07em", color: "#6B6B6B", display: "block", marginBottom: 5
+                                    letterSpacing: "0.07em", color: "var(--ink-muted)", display: "block", marginBottom: 5
                                 }}>Tone</label>
                                 <select value={form.tone} onChange={e => setForm(f => ({ ...f, tone: e.target.value }))}
                                     style={{ ...inp, cursor: "pointer" }}>
@@ -142,7 +142,7 @@ export default function AIDraftGenerator({ onApply }: Props) {
                             <div>
                                 <label style={{
                                     fontSize: 11, fontWeight: 700, textTransform: "uppercase",
-                                    letterSpacing: "0.07em", color: "#6B6B6B", display: "block", marginBottom: 5
+                                    letterSpacing: "0.07em", color: "var(--ink-muted)", display: "block", marginBottom: 5
                                 }}>Length</label>
                                 <select value={form.length} onChange={e => setForm(f => ({ ...f, length: e.target.value }))}
                                     style={{ ...inp, cursor: "pointer" }}>
@@ -154,7 +154,7 @@ export default function AIDraftGenerator({ onApply }: Props) {
                             <div style={{ gridColumn: "1/-1" }}>
                                 <label style={{
                                     fontSize: 11, fontWeight: 700, textTransform: "uppercase",
-                                    letterSpacing: "0.07em", color: "#6B6B6B", display: "block", marginBottom: 5
+                                    letterSpacing: "0.07em", color: "var(--ink-muted)", display: "block", marginBottom: 5
                                 }}>Focus Keywords (optional)</label>
                                 <input value={form.keywords} onChange={e => setForm(f => ({ ...f, keywords: e.target.value }))}
                                     placeholder="productivity, morning routine, deep work" style={inp} />
@@ -184,29 +184,29 @@ export default function AIDraftGenerator({ onApply }: Props) {
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                                     <label style={{
                                         fontSize: 11, fontWeight: 700, textTransform: "uppercase",
-                                        letterSpacing: "0.07em", color: "#6B6B6B"
+                                        letterSpacing: "0.07em", color: "var(--ink-muted)"
                                     }}>
-                                        Generated Draft {loading && <span style={{ color: "#4F46E5" }}>● Live</span>}
+                                        Generated Draft {loading && <span style={{ color: "var(--primary-text)" }}>● Live</span>}
                                     </label>
-                                    <span style={{ fontSize: 11, color: "#A0A0A0" }}>
+                                    <span style={{ fontSize: 11, color: "var(--ink-light)" }}>
                                         ~{Math.ceil(draft.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length)} words
                                     </span>
                                 </div>
                                 <textarea ref={draftRef} value={draft} readOnly rows={14}
                                     style={{
                                         ...inp, resize: "vertical", lineHeight: 1.7,
-                                        fontFamily: "'Courier New',monospace", fontSize: 12, background: "#F8FAFC"
+                                        fontFamily: "'Courier New',monospace", fontSize: 12, background: "var(--surface-2)"
                                     }} />
 
                                 {/* Preview */}
                                 {draft && !loading && (
                                     <details style={{ marginTop: 10 }}>
-                                        <summary style={{ fontSize: 12, color: "#4F46E5", cursor: "pointer", fontWeight: 600 }}>
+                                        <summary style={{ fontSize: 12, color: "var(--primary-text)", cursor: "pointer", fontWeight: 600 }}>
                                             👁 Preview rendered HTML
                                         </summary>
                                         <div style={{
-                                            marginTop: 10, padding: 16, background: "#FAF8F5", borderRadius: 10,
-                                            border: "1px solid #E8E4DE", fontSize: 14, lineHeight: 1.8, color: "#374151",
+                                            marginTop: 10, padding: 16, background: "var(--cream)", borderRadius: 10,
+                                            border: "1px solid var(--border)", fontSize: 14, lineHeight: 1.8, color: "var(--ink-mid)",
                                             maxHeight: 300, overflow: "auto"
                                         }}
                                             dangerouslySetInnerHTML={{ __html: draft }} />
@@ -234,8 +234,8 @@ export default function AIDraftGenerator({ onApply }: Props) {
                                         </button>
                                         <button onClick={generate}
                                             style={{
-                                                padding: "11px 18px", background: "#F8FAFC", color: "#374151",
-                                                border: "1.5px solid #E8E4DE", borderRadius: 10, fontWeight: 600,
+                                                padding: "11px 18px", background: "var(--surface-2)", color: "var(--ink-mid)",
+                                                border: "1.5px solid var(--border)", borderRadius: 10, fontWeight: 600,
                                                 fontSize: 13, cursor: "pointer", fontFamily: "inherit"
                                             }}>
                                             🔄 Regenerate

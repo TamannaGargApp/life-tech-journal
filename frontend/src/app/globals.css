@@ -22,6 +22,42 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
   --shadow:    0 2px 12px rgba(0,0,0,0.07);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.09);
+
+  /* Theme tokens (light) */
+  --card:          #FFFFFF;
+  --surface-2:     #F8FAFC;
+  --surface-3:     #F1F5F9;
+  --primary-text:  #4F46E5;
+  --primary-border:#C7D2FE;
+  --accent:        #6366F1;
+  --nav-bg:        rgba(250,248,245,0.97);
+  --footer-bg:     #F3F0EB;
+  color-scheme: light;
+}
+
+/* Dark theme — set by the theme switcher in the header (Light / Dark / System) */
+:root[data-theme="dark"] {
+  --cream:         #121214;
+  --warm-white:    #17171A;
+  --ink:           #EDEBE7;
+  --ink-mid:       #D2D0CB;
+  --ink-muted:     #A9A7A2;
+  --ink-light:     #85837E;
+  --border:        #2E2E35;
+  --border-light:  #26262C;
+  --primary-light: #25234D;
+  --primary-border:#3D3A80;
+  --primary-text:  #A5A0FF;
+  --accent:        #A5A0FF;
+  --card:          #1C1C21;
+  --surface-2:     #202026;
+  --surface-3:     #26262C;
+  --nav-bg:        rgba(18,18,20,0.95);
+  --footer-bg:     #0C0C0E;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow:    0 2px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  color-scheme: dark;
 }
 
 html { scroll-behavior: smooth; }
@@ -32,7 +68,11 @@ body {
   color: var(--ink);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s, color 0.2s;
 }
+
+input, textarea, select { color: var(--ink); }
+input::placeholder, textarea::placeholder { color: var(--ink-light); }
 
 h1, h2, h3, h4 {
   font-family: 'Playfair Display', Georgia, serif;

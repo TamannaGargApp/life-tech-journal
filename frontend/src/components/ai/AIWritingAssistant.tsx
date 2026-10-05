@@ -61,7 +61,7 @@ export default function AIWritingAssistant({ content, onApply }: Props) {
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:1000,
           display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}
           onClick={e=>{ if(e.target===e.currentTarget){ setOpen(false); setResult(""); } }}>
-          <div style={{ background:"white", borderRadius:20, padding:28, width:"100%", maxWidth:620,
+          <div style={{ background:"var(--card)", borderRadius:20, padding:28, width:"100%", maxWidth:620,
             maxHeight:"90vh", overflow:"auto", boxShadow:"0 20px 60px rgba(0,0,0,0.2)" }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
@@ -69,12 +69,12 @@ export default function AIWritingAssistant({ content, onApply }: Props) {
                   border:"1.5px solid #FED7AA", display:"flex", alignItems:"center",
                   justifyContent:"center", fontSize:18 }}>🪄</div>
                 <div>
-                  <div style={{ fontWeight:700, fontSize:15, color:"#1A1A1A" }}>AI Writing Assistant</div>
-                  <div style={{ fontSize:11, color:"#A0A0A0" }}>Choose an action to improve your content</div>
+                  <div style={{ fontWeight:700, fontSize:15, color:"var(--ink)" }}>AI Writing Assistant</div>
+                  <div style={{ fontSize:11, color:"var(--ink-light)" }}>Choose an action to improve your content</div>
                 </div>
               </div>
               <button onClick={()=>{ setOpen(false); setResult(""); }}
-                style={{ background:"#F0EDE8", border:"none", borderRadius:"50%",
+                style={{ background:"var(--border-light)", border:"none", borderRadius:"50%",
                   width:28, height:28, cursor:"pointer", fontSize:14 }}>✕</button>
             </div>
 
@@ -85,11 +85,11 @@ export default function AIWritingAssistant({ content, onApply }: Props) {
                   style={{ padding:"12px 14px", borderRadius:10, border:"1.5px solid",
                     cursor:loading?"not-allowed":"pointer", fontFamily:"inherit", textAlign:"left",
                     transition:"all 0.15s",
-                    borderColor: action===a.id&&loading ? "#C2410C" : "#E8E4DE",
-                    background:  action===a.id&&loading ? "#FFF7ED" : "white" }}>
+                    borderColor: action===a.id&&loading ? "#C2410C" : "var(--border)",
+                    background:  action===a.id&&loading ? "#FFF7ED" : "var(--card)" }}>
                   <div style={{ fontSize:16, marginBottom:4 }}>{a.icon}</div>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#1A1A1A" }}>{a.label}</div>
-                  <div style={{ fontSize:11, color:"#A0A0A0" }}>{a.desc}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:"var(--ink)" }}>{a.label}</div>
+                  <div style={{ fontSize:11, color:"var(--ink-light)" }}>{a.desc}</div>
                 </button>
               ))}
             </div>
@@ -103,23 +103,23 @@ export default function AIWritingAssistant({ content, onApply }: Props) {
               <div>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
                   <label style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
-                    letterSpacing:"0.07em", color:"#6B6B6B" }}>
+                    letterSpacing:"0.07em", color:"var(--ink-muted)" }}>
                     AI Output {loading && <span style={{ color:"#C2410C" }}>● Writing…</span>}
                   </label>
                 </div>
                 <textarea value={result} readOnly rows={10}
                   style={{ width:"100%", padding:"12px 14px", borderRadius:10,
-                    border:"1.5px solid #E8E4DE", fontSize:13, fontFamily:"'Courier New',monospace",
-                    color:"#1A1A1A", resize:"vertical", background:"#F8FAFC", lineHeight:1.7 }} />
+                    border:"1.5px solid var(--border)", fontSize:13, fontFamily:"'Courier New',monospace",
+                    color:"var(--ink)", resize:"vertical", background:"var(--surface-2)", lineHeight:1.7 }} />
 
                 {result && !loading && (
                   <>
                     <details style={{ marginTop:8 }}>
-                      <summary style={{ fontSize:12, color:"#4F46E5", cursor:"pointer", fontWeight:600 }}>
+                      <summary style={{ fontSize:12, color:"var(--primary-text)", cursor:"pointer", fontWeight:600 }}>
                         👁 Preview
                       </summary>
-                      <div style={{ marginTop:8, padding:14, background:"#FAF8F5", borderRadius:10,
-                        border:"1px solid #E8E4DE", fontSize:14, lineHeight:1.8, maxHeight:200, overflow:"auto" }}
+                      <div style={{ marginTop:8, padding:14, background:"var(--cream)", borderRadius:10,
+                        border:"1px solid var(--border)", fontSize:14, lineHeight:1.8, maxHeight:200, overflow:"auto" }}
                         dangerouslySetInnerHTML={{ __html: result }} />
                     </details>
                     <div style={{ display:"flex", gap:10, marginTop:12 }}>

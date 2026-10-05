@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import SiteNavbar from "@/components/SiteNavbar";
+import SiteFooter from "@/components/SiteFooter";
+import { AI_ARTICLE, AI_ARTICLE_SLUG } from "@/data/aiArticle";
 
 const AISummarizer = dynamic(() => import("@/components/ai/AISummarizer"), { ssr: false });
 
@@ -40,81 +43,6 @@ const CAT_LABELS: Record<string,string> = {
   "data-science":"Data Science",motivation:"Motivation",productivity:"Productivity",
   relationships:"Relationships",cloud:"Cloud Computing",default:"General",
 };
-
-function SiteNavbar() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", fn, { passive:true });
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
-  return (
-    <nav style={{ position:"sticky",top:0,zIndex:200,background:scrolled?"rgba(250,248,245,0.97)":"#FAF8F5",backdropFilter:"blur(12px)",borderBottom:"1px solid #E8E4DE",boxShadow:scrolled?"0 2px 16px rgba(0,0,0,0.06)":"none",transition:"all 0.25s" }}>
-      <div style={{ maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",height:64,gap:24 }}>
-        <Link href="/" style={{ textDecoration:"none",flexShrink:0 }}>
-          <div style={{ fontFamily:"'Playfair Display',serif",fontWeight:700,fontSize:20,color:"#1A1A1A",lineHeight:1 }}>
-            Life <span style={{ color:"#4F46E5" }}>&</span> Tech
-            <div style={{ fontSize:9,fontFamily:"Lato,sans-serif",fontWeight:300,letterSpacing:"0.22em",textTransform:"uppercase",color:"#A0A0A0",marginTop:2 }}>Journal</div>
-          </div>
-        </Link>
-        <div style={{ flex:1,display:"flex",gap:2,justifyContent:"center" }}>
-          {[["Home","/"],["Blog","/blog"],["About","/about"],["Contact","/contact"]].map(([l,h])=>(
-            <Link key={l} href={h} style={{ padding:"7px 14px",fontSize:13,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",color:"#3D3D3D",borderRadius:8,textDecoration:"none",transition:"color 0.15s" }}
-              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="#4F46E5"}}
-              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="#3D3D3D"}}>
-              {l}
-            </Link>
-          ))}
-        </div>
-        <div style={{ display:"flex",gap:8,flexShrink:0 }}>
-          <Link href="/auth/login" style={{ padding:"7px 16px",fontSize:13,fontWeight:700,border:"1.5px solid #E8E4DE",borderRadius:8,color:"#3D3D3D",textDecoration:"none",transition:"all 0.15s" }}>Sign In</Link>
-          <Link href="/newsletter" style={{ padding:"7px 16px",fontSize:13,fontWeight:700,background:"#4F46E5",color:"white",borderRadius:8,textDecoration:"none" }}>Subscribe</Link>
-        </div>
-      </div>
-    </nav>
-  );
-}
-
-function SiteFooter() {
-  return (
-    <footer style={{ background:"#1A1A1A",marginTop:80 }}>
-      <div style={{ maxWidth:1200,margin:"0 auto",padding:"48px 32px 0" }}>
-        <div style={{ display:"grid",gridTemplateColumns:"1.8fr 1fr 1fr 1fr",gap:48,paddingBottom:40,borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
-          <div>
-            <div style={{ fontFamily:"'Playfair Display',serif",fontWeight:700,fontSize:20,color:"white",marginBottom:12 }}>Life <span style={{ color:"#818CF8" }}>&</span> Tech Journal</div>
-            <p style={{ fontSize:14,color:"#5D5D5D",lineHeight:1.8,maxWidth:260 }}>Stories That Inspire. Technology That Empowers.</p>
-          </div>
-          {[
-            { title:"Life",   links:[["Personal Growth","/blog?category=personal-growth"],["Career","/blog?category=career"],["Lifestyle","/blog?category=lifestyle"],["Productivity","/blog?category=productivity"]] },
-            { title:"Tech",   links:[["AI & ML","/blog?category=ai"],["Programming","/blog?category=programming"],["Web Dev","/blog?category=web-dev"],["Data Science","/blog?category=data-science"]] },
-            { title:"Company",links:[["About","/about"],["Write for Us","/write"],["Newsletter","/newsletter"],["Contact","/contact"]] },
-          ].map(col=>(
-            <div key={col.title}>
-              <div style={{ fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.12em",color:"rgba(255,255,255,0.3)",marginBottom:16 }}>{col.title}</div>
-              <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-                {col.links.map(([label,href])=>(
-                  <Link key={label} href={href} style={{ fontSize:14,color:"#5D5D5D",textDecoration:"none",transition:"color 0.15s" }}
-                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="white"}}
-                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="#5D5D5D"}}>
-                    {label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div style={{ display:"flex",justifyContent:"space-between",padding:"18px 0",fontSize:13,color:"#4B4B4B" }}>
-          <span>© 2025 Life & Tech Journal. All rights reserved.</span>
-          <div style={{ display:"flex",gap:20 }}>
-            {[["Privacy","/privacy"],["Terms","/terms"]].map(([l,h])=>(
-              <Link key={l} href={h} style={{ color:"#4B4B4B",textDecoration:"none" }}>{l}</Link>
-            ))}
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 // Reading progress bar
 function ReadingProgress() {
@@ -154,17 +82,17 @@ function ShareButtons({ title, slug }: { title:string; slug:string }) {
 
   return (
     <div style={{ display:"flex",alignItems:"center",gap:8 }}>
-      <span style={{ fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"#A0A0A0",marginRight:4 }}>Share</span>
+      <span style={{ fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"var(--ink-light)",marginRight:4 }}>Share</span>
       {shareItems.map(s=>(
         <a key={s.label} href={s.href} target="_blank" rel="noreferrer"
-          style={{ width:34,height:34,borderRadius:8,border:"1.5px solid #E8E4DE",display:"flex",alignItems:"center",justifyContent:"center",color:"#6B6B6B",fontSize:12,textDecoration:"none",transition:"all 0.15s",fontWeight:700 }}
-          onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor="#4F46E5";(e.currentTarget as HTMLElement).style.color="#4F46E5"}}
-          onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor="#E8E4DE";(e.currentTarget as HTMLElement).style.color="#6B6B6B"}}>
+          style={{ width:34,height:34,borderRadius:8,border:"1.5px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--ink-muted)",fontSize:12,textDecoration:"none",transition:"all 0.15s",fontWeight:700 }}
+          onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor="#4F46E5";(e.currentTarget as HTMLElement).style.color="var(--primary-text)"}}
+          onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor="var(--border)";(e.currentTarget as HTMLElement).style.color="var(--ink-muted)"}}>
           {s.icon}
         </a>
       ))}
       <button onClick={copy}
-        style={{ height:34,padding:"0 14px",borderRadius:8,border:"1.5px solid #E8E4DE",background:copied?"#D1FAE5":"white",color:copied?"#065F46":"#6B6B6B",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all 0.15s" }}>
+        style={{ height:34,padding:"0 14px",borderRadius:8,border:"1.5px solid var(--border)",background:copied?"#D1FAE5":"var(--card)",color:copied?"#065F46":"var(--ink-muted)",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all 0.15s" }}>
         {copied?"✓ Copied":"Copy Link"}
       </button>
     </div>
@@ -184,8 +112,13 @@ export default function ArticlePage() {
 
   useEffect(() => {
     if (!slug) return;
+    // Built-in copy of the featured AI article, used when the API doesn't have it yet
+    const useBuiltIn = () => {
+      if (slug !== AI_ARTICLE_SLUG) return false;
+      setArticle(AI_ARTICLE); setLoading(false); return true;
+    };
     fetch(`${API}/articles/${slug}`)
-      .then(r => { if (r.status===404) { setNotFound(true); setLoading(false); return null; } return r.json(); })
+      .then(r => { if (!r.ok) { if (!useBuiltIn()) { setNotFound(true); setLoading(false); } return null; } return r.json(); })
       .then(data => {
         if (!data) return;
         setArticle(data);
@@ -199,7 +132,7 @@ export default function ArticlePage() {
             .catch(()=>{});
         }
       })
-      .catch(() => { setNotFound(true); setLoading(false); });
+      .catch(() => { if (!useBuiltIn()) { setNotFound(true); setLoading(false); } });
   }, [slug]);
 
   const handleLike = async () => {
@@ -231,14 +164,14 @@ export default function ArticlePage() {
 
   // Loading skeleton
   if (loading) return (
-    <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"#FAF8F5" }}>
+    <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"var(--cream)" }}>
       <SiteNavbar />
       <div style={{ maxWidth:740,margin:"0 auto",padding:"60px 32px" }}>
-        <div style={{ height:24,width:80,background:"#F0EDE8",borderRadius:6,marginBottom:20,animation:"shimmer 1.5s infinite" }} />
-        <div style={{ height:44,width:"85%",background:"#F0EDE8",borderRadius:8,marginBottom:12,animation:"shimmer 1.5s infinite" }} />
-        <div style={{ height:44,width:"60%",background:"#F0EDE8",borderRadius:8,marginBottom:32,animation:"shimmer 1.5s infinite" }} />
-        <div style={{ height:360,background:"#F0EDE8",borderRadius:16,marginBottom:40,animation:"shimmer 1.5s infinite" }} />
-        {[1,2,3,4,5].map(i=><div key={i} style={{ height:18,background:"#F0EDE8",borderRadius:6,marginBottom:12,width:`${70+i*5}%`,animation:"shimmer 1.5s infinite" }} />)}
+        <div style={{ height:24,width:80,background:"var(--border-light)",borderRadius:6,marginBottom:20,animation:"shimmer 1.5s infinite" }} />
+        <div style={{ height:44,width:"85%",background:"var(--border-light)",borderRadius:8,marginBottom:12,animation:"shimmer 1.5s infinite" }} />
+        <div style={{ height:44,width:"60%",background:"var(--border-light)",borderRadius:8,marginBottom:32,animation:"shimmer 1.5s infinite" }} />
+        <div style={{ height:360,background:"var(--border-light)",borderRadius:16,marginBottom:40,animation:"shimmer 1.5s infinite" }} />
+        {[1,2,3,4,5].map(i=><div key={i} style={{ height:18,background:"var(--border-light)",borderRadius:6,marginBottom:12,width:`${70+i*5}%`,animation:"shimmer 1.5s infinite" }} />)}
       </div>
       <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
     </div>
@@ -246,12 +179,12 @@ export default function ArticlePage() {
 
   // 404
   if (notFound) return (
-    <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"#FAF8F5" }}>
+    <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"var(--cream)" }}>
       <SiteNavbar />
       <div style={{ maxWidth:600,margin:"0 auto",padding:"100px 32px",textAlign:"center" }}>
         <div style={{ fontSize:64,marginBottom:24 }}>📭</div>
-        <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:36,fontWeight:700,color:"#1A1A1A",marginBottom:12 }}>Article Not Found</h1>
-        <p style={{ color:"#6B6B6B",fontSize:16,marginBottom:32,lineHeight:1.7 }}>The article you're looking for doesn't exist or may have been moved.</p>
+        <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:36,fontWeight:700,color:"var(--ink)",marginBottom:12 }}>Article Not Found</h1>
+        <p style={{ color:"var(--ink-muted)",fontSize:16,marginBottom:32,lineHeight:1.7 }}>The article you're looking for doesn't exist or may have been moved.</p>
         <Link href="/blog" style={{ background:"#4F46E5",color:"white",padding:"12px 28px",borderRadius:10,fontWeight:700,fontSize:15,textDecoration:"none" }}>Browse All Articles →</Link>
       </div>
     </div>
@@ -262,7 +195,7 @@ export default function ArticlePage() {
     : new Date(article.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});
 
   return (
-    <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"#FAF8F5" }}>
+    <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"var(--cream)" }}>
       <ReadingProgress />
       <SiteNavbar />
 
@@ -310,14 +243,14 @@ export default function ArticlePage() {
       </div>
 
       {/* ── Meta bar ── */}
-      <div style={{ background:"white",borderBottom:"1px solid #E8E4DE",position:"sticky",top:64,zIndex:100 }}>
+      <div style={{ background:"var(--card)",borderBottom:"1px solid var(--border)",position:"sticky",top:69,zIndex:100 }}>
         <div style={{ maxWidth:1100,margin:"0 auto",padding:"0 32px",height:52,display:"flex",alignItems:"center",justifyContent:"space-between" }}>
-          <div style={{ display:"flex",alignItems:"center",gap:16,fontSize:13,color:"#6B6B6B" }}>
+          <div style={{ display:"flex",alignItems:"center",gap:16,fontSize:13,color:"var(--ink-muted)" }}>
             {/* Author avatar */}
             <div style={{ width:30,height:30,borderRadius:"50%",background:grad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0 }}>
               {(article.author_name || article.author_id || "A")[0].toUpperCase()}
             </div>
-            <span style={{ fontWeight:600,color:"#3D3D3D" }}>{article.author_name || "Life & Tech Team"}</span>
+            <span style={{ fontWeight:600,color:"var(--ink-mid)" }}>{article.author_name || "Life & Tech Team"}</span>
             <span style={{ color:"#D1D5DB" }}>·</span>
             <span>{publishDate}</span>
             <span style={{ color:"#D1D5DB" }}>·</span>
@@ -336,7 +269,7 @@ export default function ArticlePage() {
         <article>
           {/* Excerpt pull quote if has image */}
           {article.featured_image && article.excerpt && (
-            <p style={{ fontFamily:"'Playfair Display',serif",fontSize:20,fontStyle:"italic",color:"#4F46E5",lineHeight:1.7,marginBottom:36,paddingLeft:20,borderLeft:"3px solid #4F46E5" }}>
+            <p style={{ fontFamily:"'Playfair Display',serif",fontSize:20,fontStyle:"italic",color:"var(--primary-text)",lineHeight:1.7,marginBottom:36,paddingLeft:20,borderLeft:"3px solid #4F46E5" }}>
               {article.excerpt}
             </p>
           )}
@@ -345,34 +278,34 @@ export default function ArticlePage() {
           <div
             className="article-content"
             dangerouslySetInnerHTML={{ __html: article.content || "<p>No content available.</p>" }}
-            style={{ fontSize:17,lineHeight:1.85,color:"#2D2D2D" }}
+            style={{ fontSize:17,lineHeight:1.85,color:"var(--ink-mid)" }}
           />
 
           {/* Tags / keywords */}
           {article.seo?.keywords?.length > 0 && (
-            <div style={{ marginTop:40,paddingTop:28,borderTop:"1px solid #E8E4DE",display:"flex",flexWrap:"wrap",gap:8,alignItems:"center" }}>
-              <span style={{ fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"#A0A0A0",marginRight:4 }}>Tags</span>
+            <div style={{ marginTop:40,paddingTop:28,borderTop:"1px solid var(--border)",display:"flex",flexWrap:"wrap",gap:8,alignItems:"center" }}>
+              <span style={{ fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"var(--ink-light)",marginRight:4 }}>Tags</span>
               {article.seo.keywords.map((k:string) => (
-                <span key={k} style={{ fontSize:12,padding:"4px 12px",borderRadius:100,border:"1.5px solid #E8E4DE",color:"#6B6B6B",background:"white" }}>#{k}</span>
+                <span key={k} style={{ fontSize:12,padding:"4px 12px",borderRadius:100,border:"1.5px solid var(--border)",color:"var(--ink-muted)",background:"var(--card)" }}>#{k}</span>
               ))}
             </div>
           )}
 
           {/* Like / Save / Share */}
-          <div style={{ marginTop:40,padding:"24px 28px",background:"white",borderRadius:16,border:"1px solid #F0EDE8",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16 }}>
+          <div style={{ marginTop:40,padding:"24px 28px",background:"var(--card)",borderRadius:16,border:"1px solid var(--border-light)",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16 }}>
             <div style={{ display:"flex",gap:12 }}>
               <button onClick={handleLike}
                 style={{ display:"flex",alignItems:"center",gap:8,padding:"9px 18px",borderRadius:10,border:"1.5px solid",cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,transition:"all 0.2s",
-                  background:liked?"#FEF2F2":"white",
-                  borderColor:liked?"#F43F5E":"#E8E4DE",
-                  color:liked?"#F43F5E":"#6B6B6B" }}>
+                  background:liked?"#FEF2F2":"var(--card)",
+                  borderColor:liked?"#F43F5E":"var(--border)",
+                  color:liked?"#F43F5E":"var(--ink-muted)" }}>
                 {liked?"❤️":"🤍"} {likes} {likes===1?"Like":"Likes"}
               </button>
               <button onClick={handleSave}
                 style={{ display:"flex",alignItems:"center",gap:8,padding:"9px 18px",borderRadius:10,border:"1.5px solid",cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,transition:"all 0.2s",
-                  background:saved?"#EEF2FF":"white",
-                  borderColor:saved?"#4F46E5":"#E8E4DE",
-                  color:saved?"#4F46E5":"#6B6B6B" }}>
+                  background:saved?"var(--primary-light)":"var(--card)",
+                  borderColor:saved?"#4F46E5":"var(--border)",
+                  color:saved?"#4F46E5":"var(--ink-muted)" }}>
                 {saved?"🔖":"📌"} {saved?"Saved":"Save"}
               </button>
             </div>
@@ -380,22 +313,22 @@ export default function ArticlePage() {
           </div>
 
           {/* Author card */}
-          <div style={{ marginTop:32,padding:"28px",background:"white",borderRadius:16,border:"1px solid #F0EDE8",display:"flex",gap:18 }}>
+          <div style={{ marginTop:32,padding:"28px",background:"var(--card)",borderRadius:16,border:"1px solid var(--border-light)",display:"flex",gap:18 }}>
             <div style={{ width:56,height:56,borderRadius:"50%",background:grad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>
               {emoji}
             </div>
             <div>
-              <div style={{ fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"#A0A0A0",marginBottom:4 }}>Written by</div>
-              <div style={{ fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#1A1A1A",marginBottom:6 }}>{article.author_name || "Life & Tech Team"}</div>
-              <p style={{ fontSize:14,color:"#6B6B6B",lineHeight:1.6 }}>Contributing writer at Life & Tech Journal. Covering stories that inspire and technology that empowers.</p>
-              <Link href="/blog" style={{ display:"inline-block",marginTop:10,fontSize:13,fontWeight:700,color:"#4F46E5",textDecoration:"none" }}>More articles →</Link>
+              <div style={{ fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"var(--ink-light)",marginBottom:4 }}>Written by</div>
+              <div style={{ fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"var(--ink)",marginBottom:6 }}>{article.author_name || "Life & Tech Team"}</div>
+              <p style={{ fontSize:14,color:"var(--ink-muted)",lineHeight:1.6 }}>Contributing writer at Life & Tech Journal. Covering stories that inspire and technology that empowers.</p>
+              <Link href="/blog" style={{ display:"inline-block",marginTop:10,fontSize:13,fontWeight:700,color:"var(--primary-text)",textDecoration:"none" }}>More articles →</Link>
             </div>
           </div>
 
           {/* Related articles */}
           {related.length > 0 && (
             <div style={{ marginTop:48 }}>
-              <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1A1A1A",marginBottom:20 }}>You Might Also Like</h3>
+              <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"var(--ink)",marginBottom:20 }}>You Might Also Like</h3>
               <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:16 }}>
                 {related.map((r:any) => {
                   const rc   = (r.category_id||"default").toLowerCase().replace(/\s+/g,"-");
@@ -403,13 +336,13 @@ export default function ArticlePage() {
                   const re   = CAT_EMOJI[rc]??CAT_EMOJI.default;
                   return (
                     <Link key={r.id||r.slug} href={`/blog/${r.slug}`} style={{ textDecoration:"none" }}>
-                      <div style={{ background:"white",borderRadius:14,overflow:"hidden",border:"1px solid #F0EDE8",transition:"all 0.2s" }}
+                      <div style={{ background:"var(--card)",borderRadius:14,overflow:"hidden",border:"1px solid var(--border-light)",transition:"all 0.2s" }}
                         onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.boxShadow="0 6px 20px rgba(79,70,229,0.1)";(e.currentTarget as HTMLElement).style.transform="translateY(-3px)"}}
                         onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.boxShadow="none";(e.currentTarget as HTMLElement).style.transform="translateY(0)"}}>
                         <div style={{ height:100,background:rg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28 }}>{re}</div>
                         <div style={{ padding:"12px 14px" }}>
-                          <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",color:"#4F46E5",marginBottom:5 }}>{CAT_LABELS[rc]}</div>
-                          <div style={{ fontFamily:"'Playfair Display',serif",fontSize:14,fontWeight:700,color:"#1A1A1A",lineHeight:1.4 }}>{r.title}</div>
+                          <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",color:"var(--primary-text)",marginBottom:5 }}>{CAT_LABELS[rc]}</div>
+                          <div style={{ fontFamily:"'Playfair Display',serif",fontSize:14,fontWeight:700,color:"var(--ink)",lineHeight:1.4 }}>{r.title}</div>
                         </div>
                       </div>
                     </Link>
@@ -423,8 +356,8 @@ export default function ArticlePage() {
         {/* ── Sidebar ── */}
         <aside style={{ position:"sticky",top:128,display:"flex",flexDirection:"column",gap:20 }}>
           {/* Article info */}
-          <div style={{ background:"white",borderRadius:16,padding:22,border:"1px solid #F0EDE8" }}>
-            <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#A0A0A0",marginBottom:14,paddingBottom:10,borderBottom:"1px solid #F0EDE8" }}>Article Info</div>
+          <div style={{ background:"var(--card)",borderRadius:16,padding:22,border:"1px solid var(--border-light)" }}>
+            <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"var(--ink-light)",marginBottom:14,paddingBottom:10,borderBottom:"1px solid var(--border-light)" }}>Article Info</div>
             {[
               ["📂","Category",  label],
               ["📅","Published", publishDate],
@@ -434,15 +367,15 @@ export default function ArticlePage() {
               ["🔖","Saves",     (article.bookmarks??0).toLocaleString()],
             ].map(([icon,key,val])=>(
               <div key={key} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:13,marginBottom:10 }}>
-                <span style={{ color:"#6B6B6B" }}>{icon} {key}</span>
-                <span style={{ fontWeight:700,color:"#1A1A1A",fontSize:12 }}>{val}</span>
+                <span style={{ color:"var(--ink-muted)" }}>{icon} {key}</span>
+                <span style={{ fontWeight:700,color:"var(--ink)",fontSize:12 }}>{val}</span>
               </div>
             ))}
           </div>
 
           {/* Category nav */}
-          <div style={{ background:"white",borderRadius:16,padding:22,border:"1px solid #F0EDE8" }}>
-            <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#A0A0A0",marginBottom:14,paddingBottom:10,borderBottom:"1px solid #F0EDE8" }}>Browse Category</div>
+          <div style={{ background:"var(--card)",borderRadius:16,padding:22,border:"1px solid var(--border-light)" }}>
+            <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"var(--ink-light)",marginBottom:14,paddingBottom:10,borderBottom:"1px solid var(--border-light)" }}>Browse Category</div>
             <Link href={`/blog?category=${cat}`}
               style={{ display:"flex",alignItems:"center",gap:10,padding:"12px 14px",borderRadius:10,background:grad,textDecoration:"none",marginBottom:12 }}>
               <span style={{ fontSize:20 }}>{emoji}</span>
@@ -451,7 +384,7 @@ export default function ArticlePage() {
                 <div style={{ fontSize:11,color:"rgba(255,255,255,0.7)" }}>More articles →</div>
               </div>
             </Link>
-            <Link href="/blog" style={{ display:"block",textAlign:"center",fontSize:13,fontWeight:600,color:"#4F46E5",textDecoration:"none",padding:"8px",borderRadius:8,border:"1.5px solid #C7D2FE",background:"#EEF2FF" }}>
+            <Link href="/blog" style={{ display:"block",textAlign:"center",fontSize:13,fontWeight:600,color:"var(--primary-text)",textDecoration:"none",padding:"8px",borderRadius:8,border:"1.5px solid var(--primary-border)",background:"var(--primary-light)" }}>
               All Articles
             </Link>
           </div>
@@ -496,51 +429,51 @@ export default function ArticlePage() {
 
         .article-content h1 {
           font-family: 'Playfair Display', serif;
-          font-size: 2.2rem; font-weight: 700; color: #0f172a;
+          font-size: 2.2rem; font-weight: 700; color: var(--ink);
           line-height: 1.2; margin: 2rem 0 1rem;
         }
         .article-content h2 {
           font-family: 'Playfair Display', serif;
-          font-size: 1.7rem; font-weight: 700; color: #0f172a;
+          font-size: 1.7rem; font-weight: 700; color: var(--ink);
           line-height: 1.25; margin: 2.5rem 0 1rem;
-          padding-bottom: 0.5rem; border-bottom: 2px solid #F0EDE8;
+          padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-light);
         }
         .article-content h3 {
           font-family: 'Playfair Display', serif;
-          font-size: 1.3rem; font-weight: 700; color: #1A1A1A;
+          font-size: 1.3rem; font-weight: 700; color: var(--ink);
           margin: 2rem 0 0.75rem;
         }
         .article-content p {
-          margin-bottom: 1.5rem; color: #2D2D2D; line-height: 1.85;
+          margin-bottom: 1.5rem; color: var(--ink-mid); line-height: 1.85;
         }
         .article-content a {
-          color: #4F46E5; text-decoration: underline; text-underline-offset: 3px;
+          color: var(--primary-text); text-decoration: underline; text-underline-offset: 3px;
           font-weight: 600;
         }
         .article-content a:hover { color: #3730A3; }
-        .article-content strong { color: #0f172a; font-weight: 700; }
-        .article-content em { font-style: italic; color: #374151; }
+        .article-content strong { color: var(--ink); font-weight: 700; }
+        .article-content em { font-style: italic; color: var(--ink-mid); }
         .article-content ul, .article-content ol {
           margin: 1.25rem 0 1.5rem 1.5rem; padding: 0;
         }
         .article-content li {
-          margin-bottom: 0.6rem; line-height: 1.7; color: #2D2D2D;
+          margin-bottom: 0.6rem; line-height: 1.7; color: var(--ink-mid);
         }
         .article-content blockquote {
           margin: 2rem 0; padding: 20px 24px;
           border-left: 4px solid #4F46E5;
-          background: #EEF2FF; border-radius: 0 12px 12px 0;
+          background: var(--primary-light); border-radius: 0 12px 12px 0;
           font-family: 'Playfair Display', serif;
-          font-size: 1.1rem; font-style: italic; color: #3730A3;
+          font-size: 1.1rem; font-style: italic; color: var(--primary-text);
           line-height: 1.7;
         }
         .article-content code {
-          background: #F1F5F9; color: #E11D48;
+          background: var(--surface-3); color: #E11D48;
           padding: 2px 7px; border-radius: 5px;
           font-family: 'Courier New', monospace; font-size: 0.88em;
         }
         .article-content pre {
-          background: #0f172a; color: #e2e8f0;
+          background: #0f172a; color: #E8E4DE;
           padding: 20px 24px; border-radius: 12px;
           overflow-x: auto; margin: 1.5rem 0;
           font-family: 'Courier New', monospace; font-size: 0.9rem;
@@ -555,7 +488,7 @@ export default function ArticlePage() {
           margin: 1.5rem 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
         .article-content hr {
-          border: none; border-top: 2px solid #F0EDE8;
+          border: none; border-top: 2px solid var(--border-light);
           margin: 2.5rem 0;
         }
         .article-content table {
@@ -568,11 +501,11 @@ export default function ArticlePage() {
           font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
         }
         .article-content td {
-          padding: 10px 14px; border-bottom: 1px solid #F0EDE8;
-          font-size: 14px; color: #374151;
+          padding: 10px 14px; border-bottom: 1px solid var(--border-light);
+          font-size: 14px; color: var(--ink-mid);
         }
         .article-content tr:last-child td { border-bottom: none; }
-        .article-content tr:nth-child(even) td { background: #F8FAFC; }
+        .article-content tr:nth-child(even) td { background: var(--surface-2); }
       `}</style>
     </div>
   );

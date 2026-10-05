@@ -50,27 +50,27 @@ export default function AITagSuggester({ title, content, onApply }: Props) {
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:1000,
           display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}
           onClick={e=>{ if(e.target===e.currentTarget) setOpen(false); }}>
-          <div style={{ background:"white", borderRadius:20, padding:28, maxWidth:440, width:"100%",
+          <div style={{ background:"var(--card)", borderRadius:20, padding:28, maxWidth:440, width:"100%",
             boxShadow:"0 20px 60px rgba(0,0,0,0.2)" }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{ width:36, height:36, borderRadius:10, background:"#F0FDF4",
                   display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>🏷️</div>
                 <div>
-                  <div style={{ fontWeight:700, fontSize:15, color:"#1A1A1A" }}>AI Tag Suggester</div>
-                  <div style={{ fontSize:11, color:"#A0A0A0" }}>Auto-classify your article</div>
+                  <div style={{ fontWeight:700, fontSize:15, color:"var(--ink)" }}>AI Tag Suggester</div>
+                  <div style={{ fontSize:11, color:"var(--ink-light)" }}>Auto-classify your article</div>
                 </div>
               </div>
               <button onClick={()=>setOpen(false)}
-                style={{ background:"#F0EDE8", border:"none", borderRadius:"50%",
+                style={{ background:"var(--border-light)", border:"none", borderRadius:"50%",
                   width:28, height:28, cursor:"pointer", fontSize:14 }}>✕</button>
             </div>
 
             {loading ? (
               <div style={{ padding:"28px 0", textAlign:"center" }}>
-                <div style={{ width:32, height:32, border:"3px solid #E8E4DE", borderTopColor:"#059669",
+                <div style={{ width:32, height:32, border:"3px solid var(--border)", borderTopColor:"#059669",
                   borderRadius:"50%", animation:"spin 0.8s linear infinite", margin:"0 auto 12px" }} />
-                <div style={{ color:"#A0A0A0", fontSize:13 }}>Analyzing article content…</div>
+                <div style={{ color:"var(--ink-light)", fontSize:13 }}>Analyzing article content…</div>
                 <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
               </div>
             ) : error ? (
@@ -83,7 +83,7 @@ export default function AITagSuggester({ title, content, onApply }: Props) {
                   <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
                     letterSpacing:"0.07em", color:"#059669", marginBottom:8 }}>Suggested Category</div>
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                    <span style={{ fontSize:16, fontWeight:700, color:"#1A1A1A" }}>{result.category}</span>
+                    <span style={{ fontSize:16, fontWeight:700, color:"var(--ink)" }}>{result.category}</span>
                     <span style={{ fontSize:12, fontWeight:700, color:"#059669",
                       background:"#DCFCE7", padding:"3px 10px", borderRadius:100 }}>
                       {confidence}% confidence
@@ -93,10 +93,10 @@ export default function AITagSuggester({ title, content, onApply }: Props) {
 
                 <div>
                   <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
-                    letterSpacing:"0.07em", color:"#6B6B6B", marginBottom:8 }}>Suggested Keywords</div>
+                    letterSpacing:"0.07em", color:"var(--ink-muted)", marginBottom:8 }}>Suggested Keywords</div>
                   <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                     {result.keywords.map((k: string) => (
-                      <span key={k} style={{ background:"#EEF2FF", color:"#4F46E5",
+                      <span key={k} style={{ background:"var(--primary-light)", color:"var(--primary-text)",
                         fontSize:12, padding:"4px 12px", borderRadius:100, fontWeight:600 }}>{k}</span>
                     ))}
                   </div>
@@ -110,8 +110,8 @@ export default function AITagSuggester({ title, content, onApply }: Props) {
                     ✅ Apply Tags
                   </button>
                   <button onClick={suggest}
-                    style={{ padding:"10px 16px", background:"#F8FAFC", color:"#374151",
-                      border:"1.5px solid #E8E4DE", borderRadius:10, fontWeight:600,
+                    style={{ padding:"10px 16px", background:"var(--surface-2)", color:"var(--ink-mid)",
+                      border:"1.5px solid var(--border)", borderRadius:10, fontWeight:600,
                       fontSize:13, cursor:"pointer", fontFamily:"inherit" }}>
                     🔄
                   </button>

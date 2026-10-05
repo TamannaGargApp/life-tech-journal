@@ -1,27 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-
-function SiteNavbar() {
-  return (
-    <nav style={{ position:"sticky",top:0,zIndex:200,background:"rgba(250,248,245,0.97)",backdropFilter:"blur(12px)",borderBottom:"1px solid #E8E4DE" }}>
-      <div style={{ maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",height:64,gap:24 }}>
-        <Link href="/" style={{ textDecoration:"none",flexShrink:0 }}>
-          <div style={{ fontFamily:"'Playfair Display',serif",fontWeight:700,fontSize:20,color:"#1A1A1A",lineHeight:1 }}>
-            Life <span style={{ color:"#4F46E5" }}>&</span> Tech
-            <div style={{ fontSize:9,fontWeight:300,letterSpacing:"0.22em",textTransform:"uppercase",color:"#A0A0A0",marginTop:2 }}>Journal</div>
-          </div>
-        </Link>
-        <div style={{ flex:1,display:"flex",gap:2,justifyContent:"center" }}>
-          {[["Home","/"],["Blog","/blog"],["About","/about"],["Contact","/contact"]].map(([l,h])=>(
-            <Link key={l} href={h} style={{ padding:"7px 14px",fontSize:13,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",color:l==="Gallery"?"#4F46E5":"#3D3D3D",borderRadius:8,textDecoration:"none" }}>{l}</Link>
-          ))}
-        </div>
-        <Link href="/newsletter" style={{ padding:"7px 16px",fontSize:13,fontWeight:700,background:"#4F46E5",color:"white",borderRadius:8,textDecoration:"none" }}>Subscribe</Link>
-      </div>
-    </nav>
-  );
-}
+import SiteNavbar from "@/components/SiteNavbar";
 
 const PHOTOS = [
   { id:1,  cat:"tech",    emoji:"💻", title:"Coding Sessions",        desc:"Behind the scenes of building Life & Tech Journal",    color:"linear-gradient(135deg,#1e1b4b,#4F46E5)" },
@@ -53,7 +33,7 @@ export default function GalleryPage() {
   const filtered = filter ? PHOTOS.filter(p => p.cat === filter) : PHOTOS;
 
   return (
-    <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"#FAF8F5" }}>
+    <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"var(--cream)" }}>
       <SiteNavbar />
 
       {/* Hero */}
@@ -74,9 +54,9 @@ export default function GalleryPage() {
           {CATS.map(c=>(
             <button key={c.value} onClick={()=>setFilter(c.value)}
               style={{ padding:"8px 20px",borderRadius:100,fontSize:13,fontWeight:600,border:"1.5px solid",cursor:"pointer",fontFamily:"inherit",transition:"all 0.18s",
-                borderColor:filter===c.value?"#4F46E5":"#E8E4DE",
-                background: filter===c.value?"#4F46E5":"white",
-                color:      filter===c.value?"white":"#6B6B6B" }}>
+                borderColor:filter===c.value?"#4F46E5":"var(--border)",
+                background: filter===c.value?"#4F46E5":"var(--card)",
+                color:      filter===c.value?"white":"var(--ink-muted)" }}>
               {c.label}
             </button>
           ))}
@@ -94,10 +74,10 @@ export default function GalleryPage() {
                 <span>{photo.emoji}</span>
                 <div style={{ position:"absolute",inset:0,background:"rgba(0,0,0,0.15)",opacity:0,transition:"opacity 0.2s" }} />
               </div>
-              <div style={{ background:"white",padding:"16px 18px" }}>
-                <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"#4F46E5",marginBottom:5 }}>{photo.cat}</div>
-                <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"#1A1A1A",marginBottom:4 }}>{photo.title}</h3>
-                <p style={{ fontSize:12,color:"#6B6B6B",lineHeight:1.6 }}>{photo.desc}</p>
+              <div style={{ background:"var(--card)",padding:"16px 18px" }}>
+                <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"var(--primary-text)",marginBottom:5 }}>{photo.cat}</div>
+                <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:700,color:"var(--ink)",marginBottom:4 }}>{photo.title}</h3>
+                <p style={{ fontSize:12,color:"var(--ink-muted)",lineHeight:1.6 }}>{photo.desc}</p>
               </div>
             </div>
           ))}
@@ -108,7 +88,7 @@ export default function GalleryPage() {
           <div>
             <div style={{ fontSize:32,marginBottom:12 }}>▶️</div>
             <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"white",marginBottom:6 }}>Watch on YouTube</h3>
-            <p style={{ fontSize:14,color:"#6B7280",lineHeight:1.7,maxWidth:400 }}>Video essays, interviews, and behind-the-scenes content on our YouTube channel.</p>
+            <p style={{ fontSize:14,color:"var(--ink-muted)",lineHeight:1.7,maxWidth:400 }}>Video essays, interviews, and behind-the-scenes content on our YouTube channel.</p>
           </div>
           <a href="https://www.youtube.com/@LifeTechJournal" target="_blank" rel="noreferrer"
             style={{ background:"#FF0000",color:"white",padding:"13px 28px",borderRadius:12,fontWeight:700,fontSize:15,textDecoration:"none",display:"flex",alignItems:"center",gap:10,flexShrink:0,transition:"all 0.15s" }}
@@ -125,7 +105,7 @@ export default function GalleryPage() {
         <div onClick={()=>setSelected(null)}
           style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:20,cursor:"pointer" }}>
           <div onClick={e=>e.stopPropagation()}
-            style={{ background:"white",borderRadius:20,overflow:"hidden",maxWidth:600,width:"100%",cursor:"default" }}>
+            style={{ background:"var(--card)",borderRadius:20,overflow:"hidden",maxWidth:600,width:"100%",cursor:"default" }}>
             <div style={{ height:320,background:selected.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:72,position:"relative" }}>
               <span>{selected.emoji}</span>
               <button onClick={()=>setSelected(null)}
@@ -134,9 +114,9 @@ export default function GalleryPage() {
               </button>
             </div>
             <div style={{ padding:"24px 28px 28px" }}>
-              <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"#4F46E5",background:"#EEF2FF",padding:"3px 10px",borderRadius:100,display:"inline-block",marginBottom:10 }}>{selected.cat}</div>
-              <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1A1A1A",marginBottom:8 }}>{selected.title}</h2>
-              <p style={{ fontSize:15,color:"#6B6B6B",lineHeight:1.7 }}>{selected.desc}</p>
+              <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"var(--primary-text)",background:"var(--primary-light)",padding:"3px 10px",borderRadius:100,display:"inline-block",marginBottom:10 }}>{selected.cat}</div>
+              <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"var(--ink)",marginBottom:8 }}>{selected.title}</h2>
+              <p style={{ fontSize:15,color:"var(--ink-muted)",lineHeight:1.7 }}>{selected.desc}</p>
             </div>
           </div>
         </div>

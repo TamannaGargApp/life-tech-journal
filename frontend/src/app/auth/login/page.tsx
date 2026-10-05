@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import SiteNavbar from "@/components/SiteNavbar";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
@@ -73,48 +74,41 @@ function LoginContent() {
 
   const inp: React.CSSProperties = {
     width:"100%", padding:"12px 14px", borderRadius:10,
-    border:"1.5px solid #E8E4DE", outline:"none",
-    fontSize:14, fontFamily:"inherit", color:"#1A1A1A",
-    background:"white", transition:"border-color 0.15s",
+    border:"1.5px solid var(--border)", outline:"none",
+    fontSize:14, fontFamily:"inherit", color:"var(--ink)",
+    background:"var(--card)", transition:"border-color 0.15s",
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#FAF8F5", fontFamily:"Lato,sans-serif", display:"flex", flexDirection:"column" }}>
-      <nav style={{ background:"white", borderBottom:"1px solid #E8E4DE", padding:"0 32px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <Link href="/" style={{ textDecoration:"none" }}>
-          <div style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:18, color:"#1A1A1A" }}>
-            Life <span style={{ color:"#4F46E5" }}>&</span> Tech Journal
-          </div>
-        </Link>
-        <Link href="/" style={{ fontSize:13, color:"#6B6B6B", textDecoration:"none" }}>← Back to Home</Link>
-      </nav>
+    <div style={{ minHeight:"100vh", background:"var(--cream)", fontFamily:"Lato,sans-serif", display:"flex", flexDirection:"column" }}>
+      <SiteNavbar />
 
       <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px" }}>
         <div style={{ width:"100%", maxWidth:420 }}>
           {/* Tab switcher */}
-          <div style={{ display:"flex", background:"white", borderRadius:12, padding:4, border:"1.5px solid #E8E4DE", marginBottom:24 }}>
+          <div style={{ display:"flex", background:"var(--card)", borderRadius:12, padding:4, border:"1.5px solid var(--border)", marginBottom:24 }}>
             {(["login","register"] as const).map(t=>(
               <button key={t} onClick={()=>{ setTab(t); setErrMsg(""); setStatus("idle"); }}
                 style={{ flex:1, padding:"9px", borderRadius:9, border:"none", fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"inherit", transition:"all 0.2s",
-                  background:tab===t?"#4F46E5":"transparent", color:tab===t?"white":"#6B6B6B" }}>
+                  background:tab===t?"#4F46E5":"transparent", color:tab===t?"white":"var(--ink-muted)" }}>
                 {t==="login"?"Sign In":"Create Account"}
               </button>
             ))}
           </div>
 
-          <div style={{ background:"white", borderRadius:20, padding:36, boxShadow:"0 4px 20px rgba(0,0,0,0.07)", border:"1px solid #F0EDE8" }}>
-            <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:26, fontWeight:700, color:"#1A1A1A", marginBottom:6 }}>
+          <div style={{ background:"var(--card)", borderRadius:20, padding:36, boxShadow:"0 4px 20px rgba(0,0,0,0.07)", border:"1px solid var(--border-light)" }}>
+            <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:26, fontWeight:700, color:"var(--ink)", marginBottom:6 }}>
               {tab==="login" ? "Welcome back" : "Join us today"}
             </h1>
-            <p style={{ fontSize:14, color:"#A0A0A0", marginBottom:24 }}>
+            <p style={{ fontSize:14, color:"var(--ink-light)", marginBottom:24 }}>
               {tab==="login" ? "Sign in to your account" : "Create your free account to start reading"}
             </p>
 
             {/* Google */}
             <button onClick={handleGoogle}
-              style={{ width:"100%", padding:"12px", borderRadius:10, border:"1.5px solid #E8E4DE", background:"white", fontSize:14, fontWeight:600, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:20 }}
+              style={{ width:"100%", padding:"12px", borderRadius:10, border:"1.5px solid var(--border)", background:"var(--card)", fontSize:14, fontWeight:600, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:20 }}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor="#4F46E5";(e.currentTarget as HTMLElement).style.background="#F9FAFB"}}
-              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor="#E8E4DE";(e.currentTarget as HTMLElement).style.background="white"}}>
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor="var(--border)";(e.currentTarget as HTMLElement).style.background="var(--card)"}}>
               <svg width="18" height="18" viewBox="0 0 48 48">
                 <path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.4 5.6-5 7.3v6h8.1c4.7-4.4 7.2-10.8 7.2-17.4z"/>
                 <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-8.1-6c-2.1 1.4-4.8 2.2-7.8 2.2-6 0-11.1-4-12.9-9.5H2.7v6.2C6.7 42.8 14.8 48 24 48z"/>
@@ -125,30 +119,30 @@ function LoginContent() {
             </button>
 
             <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
-              <div style={{ flex:1, height:1, background:"#E8E4DE" }} />
-              <span style={{ fontSize:12, color:"#A0A0A0" }}>or with email</span>
-              <div style={{ flex:1, height:1, background:"#E8E4DE" }} />
+              <div style={{ flex:1, height:1, background:"var(--border)" }} />
+              <span style={{ fontSize:12, color:"var(--ink-light)" }}>or with email</span>
+              <div style={{ flex:1, height:1, background:"var(--border)" }} />
             </div>
 
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
               {tab==="register" && (
                 <div>
-                  <label style={{ fontSize:13, fontWeight:700, color:"#3D3D3D", display:"block", marginBottom:6 }}>Full Name</label>
+                  <label style={{ fontSize:13, fontWeight:700, color:"var(--ink-mid)", display:"block", marginBottom:6 }}>Full Name</label>
                   <input value={name} onChange={e=>setName(e.target.value)} placeholder="Aryan Joshi" style={inp}
                     onFocus={e=>{(e.target as HTMLElement).style.borderColor="#4F46E5"}}
-                    onBlur={e=>{(e.target as HTMLElement).style.borderColor="#E8E4DE"}} />
+                    onBlur={e=>{(e.target as HTMLElement).style.borderColor="var(--border)"}} />
                 </div>
               )}
               <div>
-                <label style={{ fontSize:13, fontWeight:700, color:"#3D3D3D", display:"block", marginBottom:6 }}>Email Address</label>
+                <label style={{ fontSize:13, fontWeight:700, color:"var(--ink-mid)", display:"block", marginBottom:6 }}>Email Address</label>
                 <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="aryan@example.com" style={inp}
                   onFocus={e=>{(e.target as HTMLElement).style.borderColor="#4F46E5"}}
-                  onBlur={e=>{(e.target as HTMLElement).style.borderColor="#E8E4DE"}} />
+                  onBlur={e=>{(e.target as HTMLElement).style.borderColor="var(--border)"}} />
               </div>
               <div>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
-                  <label style={{ fontSize:13, fontWeight:700, color:"#3D3D3D" }}>Password</label>
-                  {tab==="login" && <Link href="/auth/forgot-password" style={{ fontSize:12, color:"#4F46E5", textDecoration:"none" }}>Forgot password?</Link>}
+                  <label style={{ fontSize:13, fontWeight:700, color:"var(--ink-mid)" }}>Password</label>
+                  {tab==="login" && <Link href="/auth/forgot-password" style={{ fontSize:12, color:"var(--primary-text)", textDecoration:"none" }}>Forgot password?</Link>}
                 </div>
                 <div style={{ position:"relative" }}>
                   <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)}
@@ -156,16 +150,16 @@ function LoginContent() {
                     style={{ ...inp, paddingRight:44 }}
                     onKeyDown={e=>e.key==="Enter"&&(tab==="login"?handleLogin():handleRegister())}
                     onFocus={e=>{(e.target as HTMLElement).style.borderColor="#4F46E5"}}
-                    onBlur={e=>{(e.target as HTMLElement).style.borderColor="#E8E4DE"}} />
+                    onBlur={e=>{(e.target as HTMLElement).style.borderColor="var(--border)"}} />
                   <button onClick={()=>setShowPass(s=>!s)} type="button"
-                    style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:"#A0A0A0", fontSize:16 }}>
+                    style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:"var(--ink-light)", fontSize:16 }}>
                     {showPass?"🙈":"👁️"}
                   </button>
                 </div>
                 {tab==="register" && (
                   <div style={{ display:"flex", gap:8, marginTop:8, flexWrap:"wrap" }}>
                     {[["8+ chars", password.length>=8],["Uppercase",/[A-Z]/.test(password)],["Number",/[0-9]/.test(password)]].map(([label,ok])=>(
-                      <span key={label as string} style={{ fontSize:11, padding:"2px 8px", borderRadius:100, background:ok?"#D1FAE5":"#F0EDE8", color:ok?"#065F46":"#A0A0A0", fontWeight:600 }}>
+                      <span key={label as string} style={{ fontSize:11, padding:"2px 8px", borderRadius:100, background:ok?"#D1FAE5":"var(--border-light)", color:ok?"#065F46":"#A0A0A0", fontWeight:600 }}>
                         {ok?"✓":""} {label}
                       </span>
                     ))}
@@ -210,10 +204,10 @@ function LoginContent() {
                 : tab==="login" ? "Sign In →" : "Create Account →"}
             </button>
 
-            <p style={{ textAlign:"center", fontSize:13, color:"#A0A0A0", marginTop:16 }}>
+            <p style={{ textAlign:"center", fontSize:13, color:"var(--ink-light)", marginTop:16 }}>
               {tab==="login" ? "Don't have an account? " : "Already have an account? "}
               <button onClick={()=>{ setTab(tab==="login"?"register":"login"); setErrMsg(""); setStatus("idle"); }}
-                style={{ color:"#4F46E5", fontWeight:700, background:"none", border:"none", cursor:"pointer", fontSize:13, fontFamily:"inherit" }}>
+                style={{ color:"var(--primary-text)", fontWeight:700, background:"none", border:"none", cursor:"pointer", fontSize:13, fontFamily:"inherit" }}>
                 {tab==="login"?"Create one":"Sign in"}
               </button>
             </p>

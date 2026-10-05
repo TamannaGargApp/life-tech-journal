@@ -42,7 +42,9 @@ dist/
 # Testing
 .pytest_cache/
 .coverage
+coverage.xml
 htmlcov/
+.scannerwork/
 
 # Type checking
 .mypy_cache/
