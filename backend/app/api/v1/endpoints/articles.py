@@ -56,7 +56,9 @@ async def list_articles(
 
     query: dict = {"status": ArticleStatus.published.value}
     if category:
-        query["category_id"] = category
+        # One slug, or a comma-separated list for a whole group (Life / Technology).
+        cats = [c.strip() for c in category.split(",") if c.strip()]
+        query["category_id"] = cats[0] if len(cats) == 1 else {"$in": cats}
     if tag:
         query["tag_ids"] = tag
     if search:

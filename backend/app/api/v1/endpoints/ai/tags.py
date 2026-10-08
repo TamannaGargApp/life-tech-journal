@@ -14,7 +14,7 @@ router = APIRouter()
 
 CATEGORIES = [
     "personal-growth","career","lifestyle","relationships",
-    "productivity","travel","motivation","ai","programming",
+    "productivity","travel","motivation","musings","ai","programming",
     "web-dev","marketing","cybersecurity","cloud","data-science",
 ]
 

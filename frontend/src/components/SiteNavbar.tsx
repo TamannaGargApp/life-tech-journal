@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import SiteLogo from "@/components/SiteLogo";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
@@ -125,6 +126,7 @@ export default function SiteNavbar() {
       { label: "Productivity",    href: "/blog?category=productivity" },
       { label: "Travel",          href: "/blog?category=travel" },
       { label: "Motivation",      href: "/blog?category=motivation" },
+      { label: "Musings",     href: "/blog?category=musings" },
     ],
     Technology: [
       { label: "Artificial Intelligence", href: "/blog?category=ai" },
@@ -154,12 +156,7 @@ export default function SiteNavbar() {
 
           {/* ── Logo — clicking takes you to home ── */}
           <Link href="/" style={{ textDecoration: "none", flexShrink: 0, cursor: "pointer" }}>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 22, color: "var(--ink)", letterSpacing: "-0.02em", lineHeight: 1 }}>
-              Life <span style={{ color: "var(--primary-text)" }}>&</span> Tech
-              <div style={{ fontSize: 10, fontFamily: "Lato, sans-serif", fontWeight: 300, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--ink-light)", marginTop: 2 }}>
-                Journal
-              </div>
-            </div>
+            <SiteLogo height={56} />
           </Link>
 
           {/* ── Nav links ── */}
@@ -167,7 +164,7 @@ export default function SiteNavbar() {
 
             {/* Home — explicit link */}
             <Link href="/"
-              style={{ padding: "8px 16px", fontSize: 14, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-mid)", borderRadius: 8, textDecoration: "none", transition: "color 0.15s" }}
+              style={{ padding: "8px 12px", fontSize: 14, fontWeight: 700, letterSpacing: "0.06em", whiteSpace: "nowrap", textTransform: "uppercase", color: "var(--ink-mid)", borderRadius: 8, textDecoration: "none", transition: "color 0.15s" }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "var(--primary-text)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "var(--ink-mid)"; }}>
               Home
@@ -179,7 +176,7 @@ export default function SiteNavbar() {
                 onMouseEnter={() => setActiveMenu(key)}>
                 <Link
                   href={key === "Life" ? "/blog?group=life" : "/blog?group=tech"}
-                  style={{ padding: "8px 16px", fontSize: 14, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: activeMenu === key ? "#4F46E5" : "var(--ink-mid)", borderRadius: 8, display: "flex", alignItems: "center", gap: 4, textDecoration: "none", transition: "color 0.15s" }}>
+                  style={{ padding: "8px 12px", fontSize: 14, fontWeight: 700, letterSpacing: "0.06em", whiteSpace: "nowrap", textTransform: "uppercase", color: activeMenu === key ? "#4F46E5" : "var(--ink-mid)", borderRadius: 8, display: "flex", alignItems: "center", gap: 4, textDecoration: "none", transition: "color 0.15s" }}>
                   {key}
                   <span style={{ fontSize: 9, color: "var(--ink-light)", transform: activeMenu === key ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.15s", display: "inline-block" }}>▼</span>
                 </Link>
@@ -187,9 +184,9 @@ export default function SiteNavbar() {
             ))}
 
             {/* Other nav links */}
-            {[["Blog", "/blog"], ["About", "/about"], ["Contact", "/contact"]].map(([label, href]) => (
+            {[["Blog", "/blog"], ["Musings", "/blog?category=musings"], ["About", "/about"], ["Contact", "/contact"]].map(([label, href]) => (
               <Link key={label} href={href}
-                style={{ padding: "8px 16px", fontSize: 14, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-mid)", borderRadius: 8, textDecoration: "none", transition: "color 0.15s" }}
+                style={{ padding: "8px 12px", fontSize: 14, fontWeight: 700, letterSpacing: "0.06em", whiteSpace: "nowrap", textTransform: "uppercase", color: "var(--ink-mid)", borderRadius: 8, textDecoration: "none", transition: "color 0.15s" }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "var(--primary-text)"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "var(--ink-mid)"; }}>
                 {label}

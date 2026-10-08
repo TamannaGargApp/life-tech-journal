@@ -23,6 +23,7 @@ const LIFE_CATS = [
   { value:"productivity",    label:"Productivity",    icon:"⚡" },
   { value:"travel",          label:"Travel",          icon:"✈️" },
   { value:"motivation",      label:"Motivation",      icon:"🔥" },
+  { value:"musings",     label:"Musings",     icon:"💭" },
 ];
 
 const TECH_CATS = [
@@ -48,12 +49,13 @@ const CAT_GRAD: Record<string,string> = {
   marketing:"linear-gradient(135deg,#2D1B69,#7C3AED,#C4B5FD)",
   cybersecurity:"linear-gradient(135deg,#0F172A,#1E293B,#475569)",
   "data-science":"linear-gradient(135deg,#1E3A5F,#1D4ED8,#60A5FA)",
+  "musings":"linear-gradient(135deg,#4A044E,#A21CAF,#F0ABFC)",
   default:"linear-gradient(135deg,#1e1b4b,#4F46E5,#14B8A6)",
 };
 const CAT_EMOJI: Record<string,string> = {
   ai:"🤖","web-dev":"🌐",programming:"⌨️",career:"🚀",
   "personal-growth":"🌱",lifestyle:"☀️",travel:"✈️",
-  marketing:"📣",cybersecurity:"🛡️","data-science":"📊",default:"✍️",
+  marketing:"📣",cybersecurity:"🛡️","data-science":"📊","musings":"💭",default:"✍️",
 };
 
 // ── Star Rating ───────────────────────────────────────────────────────────────
@@ -152,37 +154,46 @@ function BlogContent() {
   const [search,   setSearch]       = useState(searchParams.get("q")??"");
   const [sort,     setSort]         = useState("latest");
   const [category, setCategory]     = useState(searchParams.get("category")??"");
+  const [group,    setGroup]        = useState(searchParams.get("group")??"");
 
-  // Sync category from URL
+  // Sync category / group (Life, Technology) from URL
   useEffect(() => {
-    const cat = searchParams.get("category")??"";
-    setCategory(cat);
+    setCategory(searchParams.get("category")??"");
+    setGroup(searchParams.get("group")??"");
+    setPage(1);
   }, [searchParams]);
+
+  // Categories to filter by: one category, or every category in the chosen group.
+  const catFilter = category
+    ? category
+    : group==="life" ? LIFE_CATS.map(c=>c.value).join(",")
+    : group==="tech" ? TECH_CATS.map(c=>c.value).join(",")
+    : "";
 
   const fetchArticles = useCallback(async () => {
     setLoading(true);
     const qs = new URLSearchParams({ page:String(page), size:"8", sort });
-    if (category) qs.set("category", category);
+    if (catFilter) qs.set("category", catFilter);
     if (search)   qs.set("search", search);
     try {
       const res  = await fetch(`${API}/articles?${qs}`);
       const data = await res.json();
       const items = data.items??[];
-      const merged = page===1 ? withAiArticle(items, { category, search }) : items;
+      const merged = page===1 ? withAiArticle(items, { category: catFilter, search }) : items;
       setArticles(merged);
       setTotal((data.total??0) + (merged.length - items.length));
     } catch {
-      const fallback = page===1 ? withAiArticle([], { category, search }) : [];
+      const fallback = page===1 ? withAiArticle([], { category: catFilter, search }) : [];
       setArticles(fallback); setTotal(fallback.length);
     }
     setLoading(false);
-  }, [page, sort, category, search]);
+  }, [page, sort, catFilter, search]);
 
   useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   const handleSearch = () => { setSearch(searchInput); setPage(1); };
   const handleCat = (val: string) => {
-    setCategory(val); setPage(1);
+    setCategory(val); setGroup(""); setPage(1);
     router.replace(val?`/blog?category=${val}`:"/blog", { scroll:false });
   };
 
@@ -230,7 +241,7 @@ function BlogContent() {
       <main style={{ maxWidth:1200,margin:"0 auto",padding:"40px 32px" }}>
         {/* Header */}
         <div style={{ marginBottom:28 }}>
-          {category && (
+          {(category || group) && (
             <button onClick={()=>handleCat("")}
               style={{ fontSize:13,color:"var(--ink-light)",background:"none",border:"none",cursor:"pointer",padding:0,marginBottom:8,display:"flex",alignItems:"center",gap:4,fontFamily:"inherit" }}>
               ← All Articles
@@ -240,7 +251,7 @@ function BlogContent() {
             <div>
               <p style={{ fontSize:10,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--ink-light)",marginBottom:4 }}>Articles</p>
               <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:30,fontWeight:700,color:"var(--ink)" }}>
-                {search?`"${search}"`:activeCat?.value?`${activeCat.icon} ${activeCat.label}`:"All Articles"}
+                {search?`"${search}"`:activeCat?.value?`${activeCat.icon} ${activeCat.label}`:group==="life"?"🌿 Life":group==="tech"?"💻 Technology":"All Articles"}
               </h1>
             </div>
             {!loading&&<span style={{ fontSize:13,color:"var(--ink-light)" }}>{total} article{total!==1?"s":""}</span>}
@@ -261,11 +272,11 @@ function BlogContent() {
                       {search?"No results found":"No articles yet"}
                     </h3>
                     <p style={{ color:"var(--ink-light)",fontSize:14,marginBottom:20 }}>
-                      {search?"Try a different term.":"Create your first article via the API."}
+                      {search?"Try a different term.":"Write the first one from the Admin Panel."}
                     </p>
                     {search
                       ?<button onClick={()=>{setSearch("");setSearchInput("");}} style={{ background:"#4F46E5",color:"white",padding:"10px 22px",borderRadius:8,fontWeight:700,fontSize:14,border:"none",cursor:"pointer",fontFamily:"inherit" }}>Clear Search</button>
-                      :<a href="http://localhost:8080/api/docs" target="_blank" rel="noreferrer" style={{ background:"#4F46E5",color:"white",padding:"10px 22px",borderRadius:8,fontWeight:700,fontSize:14,textDecoration:"none" }}>Open API Docs →</a>
+                      :<a href="/admin" style={{ background:"#4F46E5",color:"white",padding:"10px 22px",borderRadius:8,fontWeight:700,fontSize:14,textDecoration:"none" }}>Open Admin Panel →</a>
                     }
                   </div>
                 )

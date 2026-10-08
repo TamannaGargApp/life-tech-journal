@@ -99,3 +99,8 @@ a { color: inherit; text-decoration: none; }
   0%,100% { opacity:1; transform: scale(1); }
   50%      { opacity:.5; transform: scale(1.4); }
 }
+/* Logo: light artwork in light theme, dark artwork in dark theme. */
+.logo-for-dark { display: none !important; }
+:root[data-theme="dark"] .logo-for-light { display: none !important; }
+:root[data-theme="dark"] .logo-for-dark  { display: block !important; }
+.logo-for-dark, .logo-dark-only { border-radius: 10px; }

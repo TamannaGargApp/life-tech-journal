@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import SiteLogo from "@/components/SiteLogo";
 
 export default function SiteFooter() {
   const cols = [
@@ -10,6 +11,7 @@ export default function SiteFooter() {
       ["Productivity",    "/blog?category=productivity"],
       ["Travel",          "/blog?category=travel"],
       ["Motivation",      "/blog?category=motivation"],
+      ["Musings",     "/blog?category=musings"],
     ]},
     { title: "Technology", links: [
       ["AI & ML",           "/blog?category=ai"],
@@ -34,9 +36,7 @@ export default function SiteFooter() {
         <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr 1fr 1fr", gap: 48, paddingBottom: 48, borderBottom: "1px solid var(--border)" }}>
           <div>
             <Link href="/" style={{ textDecoration: "none" }}>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 22, color: "var(--ink)", marginBottom: 14, cursor: "pointer" }}>
-                Life <span style={{ color: "var(--accent)" }}>&</span> Tech Journal
-              </div>
+              <div style={{ marginBottom: 14, display: "inline-block" }}><SiteLogo height={96} /></div>
             </Link>
             <p style={{ fontSize: 14, color: "var(--ink-muted)", lineHeight: 1.8, maxWidth: 260, marginBottom: 24 }}>
               Stories That Inspire. Technology That Empowers. Published weekly for curious minds.

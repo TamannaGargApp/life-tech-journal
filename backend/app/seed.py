@@ -102,24 +102,263 @@ def _read_time(content: str) -> int:
     return max(1, math.ceil(len(re.findall(r"\w+", text)) / 200))
 
 
-async def seed_articles() -> None:
-    if await Article.find_one(Article.slug == AI_ARTICLE_SLUG):
-        return
-    admin = await User.find_one(User.role == UserRole.admin)
-    now = datetime.utcnow()
-    await Article(
+YOUTH_ARTICLE_SLUG = "youth-have-the-power-to-change-the-world"
+
+YOUTH_ARTICLE_CONTENT = """
+<p><strong>This is not a dream anymore. It is something real that is already beginning to unfold—and it is waiting to grow at full scale.</strong></p>
+<p>For years, we have heard leaders, speakers, educators, and visionaries talk about the power of youth.</p>
+<p><em>"The youth are the future."</em><br />
+<em>"Young people need to be creative."</em><br />
+<em>"We need new ideas."</em><br />
+<em>"The next generation will shape the world."</em></p>
+<p>We hear these words everywhere.</p>
+<p>But perhaps the more important question is not <strong>whether youth have the power to change the world.</strong></p>
+<p>The real question is:</p>
+<p><strong>What are we going to do with that power?</strong></p>
+<p>Because having potential and using it are two completely different things.</p>
+<hr />
+<h2>The World Is Already Changing</h2>
+<p>We are living in a time unlike any generation before us.</p>
+<p>Technology is evolving at an incredible speed. Artificial intelligence, automation, social media, digital communities, biotechnology, renewable energy, and countless other innovations are changing how we live and work.</p>
+<p>And the people growing up in this environment are not simply observers.</p>
+<p>They are participants.</p>
+<p>Today's youth have something incredibly powerful: <strong>the ability to adapt.</strong></p>
+<p>We learn new technologies quickly. We communicate across borders. We discover ideas from different cultures within seconds. We can build communities without being physically present in the same place.</p>
+<p>A young person with an idea today can potentially reach thousands—or even millions—of people without having a large organization, enormous resources, or a powerful position.</p>
+<p>That changes everything.</p>
+<p>Your <strong>ideas</strong>, <strong>enthusiasm</strong>, <strong>creativity</strong>, and <strong>determination</strong> can become the starting point of something much bigger than yourself.</p>
+<p>A single idea can become a movement.</p>
+<p>A movement can become a community.</p>
+<p>And a community can create change.</p>
+<hr />
+<h2>But Do Youth Really Have the Power?</h2>
+<p>I believe they do.</p>
+<p>But power does not always look like money, political position, authority, or influence.</p>
+<p>There is another kind of power that is often underestimated:</p>
+<h3>Soft Power.</h3>
+<p>The power to influence people through ideas.</p>
+<p>The power to inspire.</p>
+<p>The power to create.</p>
+<p>The power to educate.</p>
+<p>The power to build communities.</p>
+<p>The power to make people believe that something better is possible.</p>
+<p>You don't necessarily need to control people to influence them.</p>
+<p>Sometimes, you simply need to show them a better possibility.</p>
+<p>When someone creates something that genuinely improves people's lives, others naturally begin to notice.</p>
+<p>When someone stands for an idea consistently, people begin to listen.</p>
+<p>When someone works toward the betterment of society, that work itself becomes a form of influence.</p>
+<p>That is soft power.</p>
+<p>And in today's connected world, soft power can travel incredibly far.</p>
+<hr />
+<h2>Bigger Power, Bigger Influence</h2>
+<p>I once started looking at the idea of <em>power</em> differently.</p>
+<p>We often associate power with authority.</p>
+<p>But what if we think about it as <strong>capacity</strong>?</p>
+<p>The greater your ability to create value, the greater your potential influence.</p>
+<p>The more people you can help, the wider your impact can become.</p>
+<p>The more effectively you can communicate an idea, the further that idea can travel.</p>
+<p>And the more consistently you work toward something meaningful, the stronger your influence becomes.</p>
+<p>This does not mean everyone needs to become famous.</p>
+<p>It does not mean everyone needs millions of followers.</p>
+<p>It simply means:</p>
+<p><strong>Use whatever power you already have.</strong></p>
+<p>Your knowledge is power.</p>
+<p>Your skills are power.</p>
+<p>Your creativity is power.</p>
+<p>Your technology is power.</p>
+<p>Your voice is power.</p>
+<p>Your time is power.</p>
+<p>And your determination is perhaps one of the most important forms of power you possess.</p>
+<hr />
+<h2>Everyone Has a Plan. But How Will It Happen?</h2>
+<p>Ask young people:</p>
+<p><strong>"Do you want to change the world?"</strong></p>
+<p>Many will say yes.</p>
+<p>Ask:</p>
+<p><strong>"Do you have an idea?"</strong></p>
+<p>Many will say yes again.</p>
+<p>Some may even have a detailed plan.</p>
+<p>But then comes the question that changes everything:</p>
+<h3>"How is it actually going to happen?"</h3>
+<p>This is where dreams meet reality.</p>
+<p>It is easy to imagine a better world.</p>
+<p>It is easy to talk about innovation.</p>
+<p>It is easy to give speeches about creativity.</p>
+<p>It is easy to say, <em>"We need young people to build the future."</em></p>
+<p>But execution is difficult.</p>
+<p>And perhaps this is where we need to focus more.</p>
+<p>The world doesn't change because someone had a brilliant idea.</p>
+<p><strong>The world changes when someone decides to execute that idea.</strong></p>
+<hr />
+<h2>The Missing Piece: Execution</h2>
+<p>We don't necessarily need more motivational speeches.</p>
+<p>We need more people willing to take the first step.</p>
+<p>You may have an idea for an educational platform.</p>
+<p>Build the first version.</p>
+<p>You may want to solve an environmental problem.</p>
+<p>Start researching and testing solutions.</p>
+<p>You may want to help your local community.</p>
+<p>Start with ten people.</p>
+<p>You may want to use AI to solve a real-world problem.</p>
+<p>Learn the technology and build something.</p>
+<p>It doesn't have to begin at full scale.</p>
+<p>It just has to begin.</p>
+<p>Because execution creates something that imagination alone cannot:</p>
+<p><strong>evidence.</strong></p>
+<p>Once you build something, you can learn from it.</p>
+<p>Once you launch something, you can improve it.</p>
+<p>Once you take action, you discover problems you could never have predicted while sitting and planning.</p>
+<p>That is how ideas become reality.</p>
+<hr />
+<h2>Dream With Your Eyes Closed. Build With Them Open.</h2>
+<p>There is a question I think everyone should ask themselves at least once:</p>
+<h3>When you close your eyes and imagine the future, what kind of world do you see?</h3>
+<p>Do you see a world where technology makes people's lives easier?</p>
+<p>A world where education is accessible to everyone?</p>
+<p>A world where healthcare is more affordable?</p>
+<p>A world where people care more about the environment?</p>
+<p>A world where opportunities are not limited by geography?</p>
+<p>A world where humans and technology work together rather than compete?</p>
+<p>Whatever that vision is, don't dismiss it simply because it sounds too ambitious.</p>
+<p>Every meaningful change begins with someone imagining that things could be different.</p>
+<p>But there is an important difference between <strong>dreaming about a better world</strong> and <strong>building one.</strong></p>
+<p>Dreaming gives you direction.</p>
+<p>Execution gives you movement.</p>
+<hr />
+<h2>Determination: The Power to Keep Going</h2>
+<p>Having an idea is exciting.</p>
+<p>Starting is exciting.</p>
+<p>But continuing is where determination is tested.</p>
+<p>There will be failures.</p>
+<p>People may not understand your idea.</p>
+<p>Some people may tell you it won't work.</p>
+<p>You may lose motivation.</p>
+<p>You may build something that nobody uses.</p>
+<p>You may have to start again.</p>
+<p>And sometimes you may question whether the effort is worth it.</p>
+<p>This is where determination matters.</p>
+<p>Determination isn't simply saying:</p>
+<p><em>"I will succeed."</em></p>
+<p>It is being able to say:</p>
+<p><strong>"Even if I fail, I will learn and continue."</strong></p>
+<p>The path may change.</p>
+<p>The strategy may change.</p>
+<p>The technology may change.</p>
+<p>Your original idea may even change.</p>
+<p>But if the purpose behind it remains meaningful, you keep moving.</p>
+<p><strong>Just keep going.</strong></p>
+<p>Not blindly.</p>
+<p>Not without learning.</p>
+<p>But continuously.</p>
+<hr />
+<h2>Technology Has Given Youth Something Previous Generations Never Had</h2>
+<p>Technology has dramatically reduced the distance between an idea and its audience.</p>
+<p>You can learn almost anything.</p>
+<p>You can collaborate with people across the world.</p>
+<p>You can create software from your bedroom.</p>
+<p>You can publish your thoughts instantly.</p>
+<p>You can build a business without a physical office.</p>
+<p>You can use AI to accelerate research, creativity, development, and experimentation.</p>
+<p>You can find people who believe in the same idea as you.</p>
+<p>The tools are becoming more accessible.</p>
+<p>The question is increasingly becoming:</p>
+<p><strong>What will we do with them?</strong></p>
+<p>Technology itself will not change the world.</p>
+<p><strong>People using technology with purpose will.</strong></p>
+<p>And that is where youth have an extraordinary opportunity.</p>
+<hr />
+<h2>You Don't Have to Change the Whole World</h2>
+<p>Perhaps the phrase <em>"change the world"</em> sounds too big.</p>
+<p>So start smaller.</p>
+<p>Change something around you.</p>
+<p>Help one person.</p>
+<p>Solve one problem.</p>
+<p>Teach one skill.</p>
+<p>Build one useful product.</p>
+<p>Create one community.</p>
+<p>Improve one process.</p>
+<p>Protect one piece of nature.</p>
+<p>Give someone an opportunity.</p>
+<p>One meaningful action may seem insignificant.</p>
+<p>But imagine thousands—or millions—of young people doing this consistently.</p>
+<p>That is when individual actions begin to become collective change.</p>
+<hr />
+<h2>The Future Is Waiting for Execution</h2>
+<p>I don't think the future is something that simply happens to us.</p>
+<p>The future is something we participate in creating.</p>
+<p>And youth are not merely waiting to inherit the world.</p>
+<p><strong>They are already building it.</strong></p>
+<p>The technologies being created today, the communities being formed, the ideas being shared, and the problems being solved are already shaping what tomorrow will look like.</p>
+<p>This movement has already started.</p>
+<p>The question is whether we will participate in it.</p>
+<p>So if you have an idea, don't wait for the perfect moment.</p>
+<p>If you have a dream, don't wait until you feel completely ready.</p>
+<p>If you see a problem, don't assume someone else will solve it.</p>
+<p>Start.</p>
+<p>Learn.</p>
+<p>Build.</p>
+<p>Fail.</p>
+<p>Improve.</p>
+<p>Continue.</p>
+<p>Because the world doesn't need another generation that only talks about change.</p>
+<p><strong>It needs a generation that executes it.</strong></p>
+<hr />
+<h2>So, Do Youth Have the Power to Change the World?</h2>
+<p>Yes.</p>
+<p>But power means very little if it remains unused.</p>
+<p>Your ideas can be powerful.</p>
+<p>Your creativity can be powerful.</p>
+<p>Technology can multiply that power.</p>
+<p>Your voice can influence others.</p>
+<p>Your enthusiasm can inspire a movement.</p>
+<p>But <strong>determination turns possibility into progress.</strong></p>
+<p>So dream about the world you want to see.</p>
+<p>Then open your eyes.</p>
+<p>Look at the world that exists today.</p>
+<p>Find the gap between the two.</p>
+<p>And start building the bridge.</p>
+<p><strong>The future is not waiting for someone else.</strong></p>
+<p><strong>It is waiting for us to unfold it.</strong></p>
+""".strip()
+
+
+SEED_ARTICLES = [
+    dict(
         title="How AI is reshaping the world and people's lives",
         slug=AI_ARTICLE_SLUG,
         excerpt="From work and healthcare to education and daily routines, a clear look at how artificial intelligence is changing the world, and how to thrive alongside it.",
         content=AI_ARTICLE_CONTENT,
         category_id="ai",
-        author_id=str(admin.id) if admin else "life-tech-team",
-        status=ArticleStatus.published,
-        published_at=now,
-        read_time=_read_time(AI_ARTICLE_CONTENT),
         featured=True,
         editors_pick=True,
         meta_title="How AI is reshaping the world and people's lives",
         meta_description="How artificial intelligence is changing work, healthcare, education and everyday life, the challenges it brings, and how to thrive in an AI-shaped world.",
         keywords=["artificial intelligence", "AI", "future of work", "AI in healthcare", "AI in education", "technology trends"],
-    ).insert()
+    ),
+    dict(
+        title="Youth Have the Power to Change the World",
+        slug=YOUTH_ARTICLE_SLUG,
+        excerpt="Youth have ideas, energy and technology on their side. The real question is what we do with that power, and the missing piece is execution.",
+        content=YOUTH_ARTICLE_CONTENT,
+        category_id="motivation",
+        featured=False,
+        editors_pick=True,
+        meta_title="Youth Have the Power to Change the World",
+        meta_description="Young people have ideas, creativity and technology on their side. What turns that power into change is execution and determination.",
+        keywords=["youth", "change the world", "motivation", "execution", "determination", "soft power"],
+    ),
+]
+
+
+async def seed_articles() -> None:
+    admin = await User.find_one(User.role == UserRole.admin)
+    for data in SEED_ARTICLES:
+        if await Article.find_one(Article.slug == data["slug"]):
+            continue
+        await Article(
+            **data,
+            author_id=str(admin.id) if admin else "life-tech-team",
+            status=ArticleStatus.published,
+            published_at=datetime.utcnow(),
+            read_time=_read_time(data["content"]),
+        ).insert()

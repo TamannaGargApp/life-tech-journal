@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import SiteLogo from "@/components/SiteLogo";
 
 // AI Components — loaded dynamically to avoid SSR issues
 const AIExcerptGenerator = dynamic(() => import("@/components/ai/AIExcerptGenerator"), { ssr:false });
@@ -23,6 +24,7 @@ const CATS = [
   { value:"productivity",    label:"Productivity",     group:"Life" },
   { value:"travel",          label:"Travel",           group:"Life" },
   { value:"motivation",      label:"Motivation",       group:"Life" },
+  { value:"musings",     label:"Musings",      group:"Life" },
   { value:"ai",              label:"AI & ML",          group:"Technology" },
   { value:"programming",     label:"Programming",      group:"Technology" },
   { value:"web-dev",         label:"Web Development",  group:"Technology" },
@@ -40,6 +42,7 @@ const CAT_GRAD: Record<string,string> = {
   productivity:"linear-gradient(135deg,#1E3A5F,#0369A1,#38BDF8)",
   travel:"linear-gradient(135deg,#1E1B4B,#3730A3,#818CF8)",
   motivation:"linear-gradient(135deg,#451A03,#B45309,#FCD34D)",
+  "musings":"linear-gradient(135deg,#4A044E,#A21CAF,#F0ABFC)",
   ai:"linear-gradient(135deg,#1e1b4b,#312e81,#14B8A6)",
   programming:"linear-gradient(135deg,#451A03,#92400E,#F59E0B)",
   "web-dev":"linear-gradient(135deg,#134E4A,#0F766E,#14B8A6)",
@@ -98,7 +101,7 @@ function AdminLogin({ onLogin }: { onLogin:(token:string)=>void }) {
     <div style={{ minHeight:"100vh",background:"#0f172a",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Lato,sans-serif" }}>
       <div style={{ width:380,background:"#1e293b",borderRadius:20,padding:36,border:"1px solid rgba(255,255,255,0.08)" }}>
         <div style={{ textAlign:"center",marginBottom:28 }}>
-          <div style={{ fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"white",marginBottom:4 }}>Life <span style={{ color:"#818CF8" }}>&</span> Tech Journal</div>
+          <div style={{ display:"flex",justifyContent:"center",marginBottom:8 }}><SiteLogo height={96} variant="dark" /></div>
           <div style={{ fontSize:11,letterSpacing:"0.15em",textTransform:"uppercase",color:"rgba(255,255,255,0.3)" }}>Admin Panel</div>
         </div>
         <div style={{ display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:10,padding:3,marginBottom:24 }}>
@@ -157,7 +160,7 @@ function Sidebar({ view, setView, counts, onLogout }: { view:View; setView:(v:Vi
   return (
     <aside style={{ width:220,background:"#0f172a",minHeight:"100vh",display:"flex",flexDirection:"column",flexShrink:0,position:"fixed",top:0,left:0,bottom:0,zIndex:100 }}>
       <div style={{ padding:"20px 18px 16px",borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-        <div style={{ fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:"white",lineHeight:1.2 }}>Life <span style={{ color:"#818CF8" }}>&</span> Tech</div>
+        <SiteLogo height={64} variant="dark" />
         <div style={{ fontSize:10,letterSpacing:"0.18em",textTransform:"uppercase",color:"rgba(255,255,255,0.25)",marginTop:3 }}>CMS Dashboard</div>
       </div>
       <nav style={{ flex:1,padding:"10px 10px" }}>

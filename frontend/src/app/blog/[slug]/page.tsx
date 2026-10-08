@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import SiteNavbar from "@/components/SiteNavbar";
 import SiteFooter from "@/components/SiteFooter";
-import { AI_ARTICLE, AI_ARTICLE_SLUG } from "@/data/aiArticle";
+import { findBuiltInArticle } from "@/data/aiArticle";
 
 const AISummarizer = dynamic(() => import("@/components/ai/AISummarizer"), { ssr: false });
 
@@ -23,6 +23,7 @@ const CAT_GRAD: Record<string,string> = {
   cybersecurity:    "linear-gradient(135deg,#0F172A,#1E293B,#475569)",
   "data-science":   "linear-gradient(135deg,#1E3A5F,#1D4ED8,#60A5FA)",
   motivation:       "linear-gradient(135deg,#451A03,#B45309,#FCD34D)",
+  "musings":    "linear-gradient(135deg,#4A044E,#A21CAF,#F0ABFC)",
   productivity:     "linear-gradient(135deg,#1E3A5F,#0369A1,#38BDF8)",
   relationships:    "linear-gradient(135deg,#500724,#BE123C,#FDA4AF)",
   cloud:            "linear-gradient(135deg,#0C4A6E,#0369A1,#7DD3FC)",
@@ -33,14 +34,14 @@ const CAT_EMOJI: Record<string,string> = {
   ai:"🤖","web-dev":"🌐",programming:"⌨️",career:"🚀",
   "personal-growth":"🌱",lifestyle:"☀️",travel:"✈️",
   marketing:"📣",cybersecurity:"🛡️","data-science":"📊",
-  motivation:"🔥",productivity:"⚡",relationships:"❤️",cloud:"☁️",default:"✍️",
+  motivation:"🔥","musings":"💭",productivity:"⚡",relationships:"❤️",cloud:"☁️",default:"✍️",
 };
 
 const CAT_LABELS: Record<string,string> = {
   ai:"AI & ML","web-dev":"Web Development",programming:"Programming",
   career:"Career","personal-growth":"Personal Growth",lifestyle:"Lifestyle",
   travel:"Travel",marketing:"Digital Marketing",cybersecurity:"Cybersecurity",
-  "data-science":"Data Science",motivation:"Motivation",productivity:"Productivity",
+  "data-science":"Data Science",motivation:"Motivation","musings":"Musings",productivity:"Productivity",
   relationships:"Relationships",cloud:"Cloud Computing",default:"General",
 };
 
@@ -112,10 +113,11 @@ export default function ArticlePage() {
 
   useEffect(() => {
     if (!slug) return;
-    // Built-in copy of the featured AI article, used when the API doesn't have it yet
+    // Built-in copies of our own articles, used when the API doesn't have them yet
     const useBuiltIn = () => {
-      if (slug !== AI_ARTICLE_SLUG) return false;
-      setArticle(AI_ARTICLE); setLoading(false); return true;
+      const builtIn = findBuiltInArticle(String(slug));
+      if (!builtIn) return false;
+      setArticle(builtIn); setLoading(false); return true;
     };
     fetch(`${API}/articles/${slug}`)
       .then(r => { if (!r.ok) { if (!useBuiltIn()) { setNotFound(true); setLoading(false); } return null; } return r.json(); })

@@ -5,7 +5,7 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
 const CATS = [
     "personal-growth", "career", "lifestyle", "relationships", "productivity",
-    "travel", "motivation", "ai", "programming", "web-dev", "marketing",
+    "travel", "motivation", "musings", "ai", "programming", "web-dev", "marketing",
     "cybersecurity", "cloud", "data-science",
 ];
 

@@ -19,12 +19,13 @@ const CAT_GRAD: Record<string, string> = {
   marketing: "linear-gradient(135deg,#2D1B69,#7C3AED,#C4B5FD)",
   cybersecurity: "linear-gradient(135deg,#0F172A,#1E293B,#475569)",
   "data-science": "linear-gradient(135deg,#1E3A5F,#1D4ED8,#60A5FA)",
+  "musings": "linear-gradient(135deg,#4A044E,#A21CAF,#F0ABFC)",
   default: "linear-gradient(135deg,#1e1b4b,#4F46E5,#14B8A6)",
 };
 const CAT_EMOJI: Record<string, string> = {
   ai: "🤖", "web-dev": "🌐", programming: "⌨️", career: "🚀",
   "personal-growth": "🌱", lifestyle: "☀️", travel: "✈️",
-  marketing: "📣", cybersecurity: "🛡️", "data-science": "📊", default: "✍️",
+  marketing: "📣", cybersecurity: "🛡️", "data-science": "📊", "musings": "💭", default: "✍️",
 };
 
 function ArticleCard({ article, featured = false }: { article: any; featured?: boolean }) {
@@ -126,6 +127,7 @@ const LIFE_CATS = [
   { icon: "⚡", name: "Productivity",     slug: "productivity",    desc: "Do more, stress less" },
   { icon: "✈️", name: "Travel",           slug: "travel",          desc: "Adventures near & far" },
   { icon: "🔥", name: "Motivation",       slug: "motivation",      desc: "Stories that move you" },
+  { icon: "💭", name: "Musings",      slug: "musings",     desc: "Wry observations on people & life" },
 ];
 const TECH_CATS = [
   { icon: "🤖", name: "AI & ML",          slug: "ai",              desc: "The intelligence revolution" },
