@@ -12,6 +12,7 @@ export default function SiteFooter() {
       ["Travel",          "/blog?category=travel"],
       ["Motivation",      "/blog?category=motivation"],
       ["Musings",     "/blog?category=musings"],
+      ["Poems",       "/poems"],
     ]},
     { title: "Technology", links: [
       ["AI & ML",           "/blog?category=ai"],

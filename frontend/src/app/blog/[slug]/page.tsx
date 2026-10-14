@@ -24,6 +24,7 @@ const CAT_GRAD: Record<string,string> = {
   "data-science":   "linear-gradient(135deg,#1E3A5F,#1D4ED8,#60A5FA)",
   motivation:       "linear-gradient(135deg,#451A03,#B45309,#FCD34D)",
   "musings":    "linear-gradient(135deg,#4A044E,#A21CAF,#F0ABFC)",
+  poems:        "linear-gradient(135deg,#3B0764,#BE185D,#FDA4AF)",
   productivity:     "linear-gradient(135deg,#1E3A5F,#0369A1,#38BDF8)",
   relationships:    "linear-gradient(135deg,#500724,#BE123C,#FDA4AF)",
   cloud:            "linear-gradient(135deg,#0C4A6E,#0369A1,#7DD3FC)",
@@ -34,14 +35,14 @@ const CAT_EMOJI: Record<string,string> = {
   ai:"🤖","web-dev":"🌐",programming:"⌨️",career:"🚀",
   "personal-growth":"🌱",lifestyle:"☀️",travel:"✈️",
   marketing:"📣",cybersecurity:"🛡️","data-science":"📊",
-  motivation:"🔥","musings":"💭",productivity:"⚡",relationships:"❤️",cloud:"☁️",default:"✍️",
+  motivation:"🔥","musings":"💭",poems:"🪶",productivity:"⚡",relationships:"❤️",cloud:"☁️",default:"✍️",
 };
 
 const CAT_LABELS: Record<string,string> = {
   ai:"AI & ML","web-dev":"Web Development",programming:"Programming",
   career:"Career","personal-growth":"Personal Growth",lifestyle:"Lifestyle",
   travel:"Travel",marketing:"Digital Marketing",cybersecurity:"Cybersecurity",
-  "data-science":"Data Science",motivation:"Motivation","musings":"Musings",productivity:"Productivity",
+  "data-science":"Data Science",motivation:"Motivation","musings":"Musings",poems:"Poems",productivity:"Productivity",
   relationships:"Relationships",cloud:"Cloud Computing",default:"General",
 };
 
@@ -278,7 +279,7 @@ export default function ArticlePage() {
 
           {/* Article content */}
           <div
-            className="article-content"
+            className={`article-content${article.category_id === "poems" ? " is-poem" : ""}`}
             dangerouslySetInnerHTML={{ __html: article.content || "<p>No content available.</p>" }}
             style={{ fontSize:17,lineHeight:1.85,color:"var(--ink-mid)" }}
           />
@@ -448,6 +449,9 @@ export default function ArticlePage() {
         .article-content p {
           margin-bottom: 1.5rem; color: var(--ink-mid); line-height: 1.85;
         }
+        /* Poems: centred stanzas in a serif face, line breaks kept as written */
+        .article-content.is-poem { text-align: center; font-family: 'Playfair Display', serif; font-size: 19px; }
+        .article-content.is-poem p { margin-bottom: 2rem; line-height: 1.9; white-space: pre-line; }
         .article-content a {
           color: var(--primary-text); text-decoration: underline; text-underline-offset: 3px;
           font-weight: 600;

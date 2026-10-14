@@ -24,6 +24,7 @@ const LIFE_CATS = [
   { value:"travel",          label:"Travel",          icon:"✈️" },
   { value:"motivation",      label:"Motivation",      icon:"🔥" },
   { value:"musings",     label:"Musings",     icon:"💭" },
+  { value:"poems",       label:"Poems",       icon:"🪶" },
 ];
 
 const TECH_CATS = [
@@ -50,12 +51,13 @@ const CAT_GRAD: Record<string,string> = {
   cybersecurity:"linear-gradient(135deg,#0F172A,#1E293B,#475569)",
   "data-science":"linear-gradient(135deg,#1E3A5F,#1D4ED8,#60A5FA)",
   "musings":"linear-gradient(135deg,#4A044E,#A21CAF,#F0ABFC)",
+  poems:"linear-gradient(135deg,#3B0764,#BE185D,#FDA4AF)",
   default:"linear-gradient(135deg,#1e1b4b,#4F46E5,#14B8A6)",
 };
 const CAT_EMOJI: Record<string,string> = {
   ai:"🤖","web-dev":"🌐",programming:"⌨️",career:"🚀",
   "personal-growth":"🌱",lifestyle:"☀️",travel:"✈️",
-  marketing:"📣",cybersecurity:"🛡️","data-science":"📊","musings":"💭",default:"✍️",
+  marketing:"📣",cybersecurity:"🛡️","data-science":"📊","musings":"💭",poems:"🪶",default:"✍️",
 };
 
 // ── Star Rating ───────────────────────────────────────────────────────────────
@@ -92,50 +94,57 @@ function ArticleRow({ article }: { article: any }) {
   const grad  = CAT_GRAD[cat]  ??CAT_GRAD.default;
   const emoji = CAT_EMOJI[cat] ??CAT_EMOJI.default;
   const catMeta = ALL_CATS.find(c=>c.value===cat);
+  const author  = article.author_name ?? article.author_id?.slice(0,10) ?? "Author";
+  const date    = article.published_at?new Date(article.published_at).toLocaleDateString("en-IN",{month:"short",day:"numeric",year:"numeric"}):"Draft";
   return (
-    <div style={{ background:"var(--card)",borderRadius:14,overflow:"hidden",display:"flex",boxShadow:"0 1px 4px rgba(0,0,0,0.05)",border:"1px solid var(--border-light)",transition:"all 0.22s" }}
-      onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.boxShadow="0 6px 24px rgba(79,70,229,0.1)";el.style.transform="translateX(4px)";el.style.borderColor="var(--primary-border)"}}
-      onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.boxShadow="0 1px 4px rgba(0,0,0,0.05)";el.style.transform="translateX(0)";el.style.borderColor="var(--border-light)"}}>
-      <Link href={`/blog/${article.slug}`} style={{ textDecoration:"none",flexShrink:0 }}>
-        <div style={{ width:155,minHeight:130,background:grad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:30 }}>
-          {article.featured_image?<img src={article.featured_image} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }} />:emoji}
-        </div>
+    <article className="post-card">
+      <Link href={`/blog/${article.slug}`} className="post-thumb" style={{ background:grad,fontSize:44,textDecoration:"none" }} aria-label={article.title}>
+        {article.featured_image?<img src={article.featured_image} alt="" />:<span aria-hidden style={{ filter:"drop-shadow(0 6px 14px rgba(0,0,0,0.3))" }}>{emoji}</span>}
       </Link>
-      <div style={{ padding:"14px 18px",flex:1 }}>
-        <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:5 }}>
+      <div style={{ padding:"22px 26px",display:"flex",flexDirection:"column",minWidth:0 }}>
+        <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:10 }}>
           <Link href={`/blog?category=${cat}`} style={{ textDecoration:"none" }}>
-            <span style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.07em",color:"var(--primary-text)",background:"var(--primary-light)",padding:"2px 8px",borderRadius:100 }}>
-              {catMeta?.icon} {article.category_id??"General"}
+            <span style={{ fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"var(--primary-text)",background:"var(--primary-light)",padding:"4px 10px",borderRadius:100 }}>
+              {catMeta?.icon} {catMeta?.label ?? article.category_id ?? "General"}
             </span>
           </Link>
-          <span style={{ fontSize:11,color:"var(--ink-light)" }}>⏱ {article.read_time??1} min</span>
+          <span style={{ fontSize:12,color:"var(--ink-light)" }}>{article.read_time??1} min read</span>
         </div>
         <Link href={`/blog/${article.slug}`} style={{ textDecoration:"none" }}>
-          <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:"var(--ink)",lineHeight:1.4,marginBottom:4 }}>{article.title}</h3>
-          <p style={{ fontSize:13,color:"var(--ink-muted)",lineHeight:1.6,marginBottom:10,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden" }}>{article.excerpt}</p>
+          <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:21,fontWeight:700,color:"var(--ink)",lineHeight:1.3,marginBottom:8 }}>{article.title}</h2>
+          <p style={{ fontSize:14.5,color:"var(--ink-muted)",lineHeight:1.65,marginBottom:16,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden" }}>{article.excerpt}</p>
         </Link>
-        <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between" }}>
-          <div style={{ display:"flex",alignItems:"center",gap:6,fontSize:12,color:"var(--ink-light)" }}>
-            <div style={{ width:18,height:18,borderRadius:"50%",background:grad }} />
-            <span style={{ fontWeight:600,color:"var(--ink-muted)" }}>{article.author_name ?? article.author_id?.slice(0,10) ?? "Author"}</span>
-            <span>·</span>
-            <span>{article.published_at?new Date(article.published_at).toLocaleDateString("en-IN",{month:"short",day:"numeric",year:"numeric"}):"Draft"}</span>
+        <div style={{ marginTop:"auto",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,paddingTop:14,borderTop:"1px solid var(--border-light)" }}>
+          <div style={{ display:"flex",alignItems:"center",gap:10,fontSize:13,color:"var(--ink-light)",minWidth:0 }}>
+            <div style={{ width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#4F46E5,#14B8A6)",color:"#fff",fontSize:12,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
+              {String(author).split(" ").map((n:string)=>n[0]).join("").slice(0,2).toUpperCase()}
+            </div>
+            <div style={{ lineHeight:1.3 }}>
+              <div style={{ fontWeight:700,color:"var(--ink-mid)" }}>{author}</div>
+              <div style={{ fontSize:12 }}>{date}</div>
+            </div>
           </div>
-          <StarRating articleId={article.id} />
+          <div style={{ display:"flex",alignItems:"center",gap:14 }}>
+            <StarRating articleId={article.id} />
+            <Link href={`/blog/${article.slug}`} style={{ fontSize:13,fontWeight:700,color:"var(--primary-text)",textDecoration:"none",whiteSpace:"nowrap" }}>
+              Read <span className="post-arrow" style={{ display:"inline-block" }}>→</span>
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
 function Skeleton() {
   return (
-    <div style={{ background:"var(--card)",borderRadius:14,overflow:"hidden",display:"flex",height:130,border:"1px solid var(--border-light)" }}>
-      <div style={{ width:155,background:"var(--border-light)",animation:"shimmer 1.5s infinite" }} />
-      <div style={{ flex:1,padding:16,display:"flex",flexDirection:"column",gap:10 }}>
-        <div style={{ height:11,width:80,background:"var(--border-light)",borderRadius:6 }} />
-        <div style={{ height:16,width:"60%",background:"var(--border-light)",borderRadius:6 }} />
-        <div style={{ height:11,width:"85%",background:"var(--border-light)",borderRadius:6 }} />
+    <div className="post-card" style={{ height:200 }}>
+      <div style={{ background:"var(--border-light)",animation:"shimmer 1.5s infinite" }} />
+      <div style={{ padding:24,display:"flex",flexDirection:"column",gap:12 }}>
+        <div style={{ height:18,width:110,background:"var(--border-light)",borderRadius:100 }} />
+        <div style={{ height:22,width:"70%",background:"var(--border-light)",borderRadius:6 }} />
+        <div style={{ height:13,width:"90%",background:"var(--border-light)",borderRadius:6 }} />
+        <div style={{ height:13,width:"60%",background:"var(--border-light)",borderRadius:6 }} />
       </div>
     </div>
   );
@@ -204,69 +213,64 @@ function BlogContent() {
     <div style={{ fontFamily:"Lato,sans-serif",minHeight:"100vh",background:"var(--cream)" }}>
       <SiteNavbar />
 
-      {/* ── Filter bar: search + sort ── */}
-      <div style={{ background:"var(--card)",borderBottom:"1px solid var(--border)",position:"sticky",top:69,zIndex:90 }}>
-        <div style={{ maxWidth:1200,margin:"0 auto",padding:"14px 32px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap" }}>
-          {/* Search */}
-          <form onSubmit={e=>{e.preventDefault();handleSearch();}}
-            style={{ flex:"1 1 320px",maxWidth:560,display:"flex",alignItems:"center",background:"var(--cream)",border:"1.5px solid var(--border)",borderRadius:12,height:46,padding:"0 6px 0 16px",gap:10,transition:"border-color 0.15s" }}
-            onFocus={e=>{(e.currentTarget as HTMLElement).style.borderColor="#4F46E5"}}
-            onBlur={e=>{(e.currentTarget as HTMLElement).style.borderColor="var(--border)"}}>
-            <span style={{ color:"var(--ink-light)",fontSize:15 }}>🔍</span>
-            <input value={searchInput} onChange={e=>setSearchInput(e.target.value)}
-              placeholder="Search articles by title or topic…"
-              aria-label="Search articles"
-              style={{ flex:1,border:"none",outline:"none",background:"none",fontSize:14,color:"var(--ink)",fontFamily:"inherit",minWidth:0 }} />
-            {searchInput && (
-              <button type="button" onClick={()=>{setSearchInput("");setSearch("");setPage(1);}} aria-label="Clear search"
-                style={{ border:"none",background:"none",color:"var(--ink-light)",fontSize:16,cursor:"pointer",padding:"0 4px",fontFamily:"inherit" }}>✕</button>
-            )}
-            <button type="submit"
-              style={{ height:34,padding:"0 18px",background:"#4F46E5",color:"white",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer",flexShrink:0,fontFamily:"inherit" }}>
-              Search
-            </button>
-          </form>
-
-          {/* Sort */}
-          <label style={{ display:"flex",alignItems:"center",gap:10,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",color:"var(--ink-light)",flexShrink:0 }}>
-            Sort by
-            <select value={sort} onChange={e=>{setSort(e.target.value);setPage(1);}}
-              style={{ height:46,padding:"0 14px",borderRadius:12,border:"1.5px solid var(--border)",fontSize:14,fontWeight:600,letterSpacing:"normal",textTransform:"none",color:"var(--ink-mid)",background:"var(--card)",cursor:"pointer",outline:"none",fontFamily:"inherit",minWidth:170 }}>
-              {SORT_OPTIONS.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </label>
-        </div>
-      </div>
-
-      <main style={{ maxWidth:1200,margin:"0 auto",padding:"40px 32px" }}>
-        {/* Header */}
-        <div style={{ marginBottom:28 }}>
-          {(category || group) && (
-            <button onClick={()=>handleCat("")}
-              style={{ fontSize:13,color:"var(--ink-light)",background:"none",border:"none",cursor:"pointer",padding:0,marginBottom:8,display:"flex",alignItems:"center",gap:4,fontFamily:"inherit" }}>
-              ← All Articles
+      {/* ── Page header: title + search + sort ── */}
+      <header className="blog-hero">
+        <div style={{ maxWidth:1200,margin:"0 auto",padding:"48px 32px 36px" }}>
+          {(category || group || search) && (
+            <button onClick={()=>{ setSearch(""); setSearchInput(""); handleCat(""); }}
+              style={{ fontSize:13,fontWeight:600,color:"var(--ink-muted)",background:"none",border:"none",cursor:"pointer",padding:0,marginBottom:14,fontFamily:"inherit" }}>
+              ← All articles
             </button>
           )}
-          <div style={{ display:"flex",alignItems:"flex-end",justifyContent:"space-between" }}>
+          <p style={{ fontSize:12,fontWeight:800,letterSpacing:"0.16em",textTransform:"uppercase",color:"var(--primary-text)",marginBottom:10 }}>
+            The Journal
+          </p>
+          <div style={{ display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:16,flexWrap:"wrap",marginBottom:28 }}>
             <div>
-              <p style={{ fontSize:10,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--ink-light)",marginBottom:4 }}>Articles</p>
-              <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:30,fontWeight:700,color:"var(--ink)" }}>
-                {search?`"${search}"`:activeCat?.value?`${activeCat.icon} ${activeCat.label}`:group==="life"?"🌿 Life":group==="tech"?"💻 Technology":"All Articles"}
+              <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:44,lineHeight:1.1,fontWeight:700,color:"var(--ink)",marginBottom:10 }}>
+                {search?`Results for "${search}"`:activeCat?.value?`${activeCat.icon} ${activeCat.label}`:group==="life"?"🌿 Life":group==="tech"?"💻 Technology":"All Articles"}
               </h1>
+              <p style={{ fontSize:16,color:"var(--ink-muted)",maxWidth:560,lineHeight:1.6 }}>
+                {group==="life"?"Personal growth, careers, relationships and the small truths of everyday life."
+                  :group==="tech"?"AI, programming and the technology shaping how we live and work."
+                  :"Stories that inspire and technology that empowers, written for curious minds."}
+              </p>
             </div>
-            {!loading&&<span style={{ fontSize:13,color:"var(--ink-light)" }}>{total} article{total!==1?"s":""}</span>}
+            {!loading&&(
+              <span style={{ fontSize:13,fontWeight:700,color:"var(--ink-muted)",background:"var(--card)",border:"1px solid var(--border)",padding:"6px 14px",borderRadius:999 }}>
+                {total} article{total!==1?"s":""}
+              </span>
+            )}
+          </div>
+
+          <div style={{ display:"flex",alignItems:"center",gap:12,flexWrap:"wrap" }}>
+            <form className="blog-search" onSubmit={e=>{e.preventDefault();handleSearch();}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{ color:"var(--ink-light)",flexShrink:0 }} aria-hidden><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input value={searchInput} onChange={e=>setSearchInput(e.target.value)}
+                placeholder="Search articles by title or topic…" aria-label="Search articles" style={{ minWidth:0 }} />
+              {searchInput && (
+                <button type="button" onClick={()=>{setSearchInput("");setSearch("");setPage(1);}} aria-label="Clear search"
+                  style={{ border:"none",background:"var(--surface-3)",color:"var(--ink-muted)",width:26,height:26,borderRadius:999,fontSize:12,cursor:"pointer",flexShrink:0 }}>✕</button>
+              )}
+              <button type="submit" className="btn-primary" style={{ height:40,padding:"0 22px" }}>Search</button>
+            </form>
+            <select className="blog-sort" aria-label="Sort articles" value={sort} onChange={e=>{setSort(e.target.value);setPage(1);}}>
+              {SORT_OPTIONS.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
           </div>
         </div>
+      </header>
 
-        <div style={{ display:"grid",gridTemplateColumns:"1fr 268px",gap:28,alignItems:"start" }}>
+      <main style={{ maxWidth:1200,margin:"0 auto",padding:"36px 32px 64px" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 280px",gap:32,alignItems:"start" }}>
           {/* List */}
-          <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
+          <div style={{ display:"flex",flexDirection:"column",gap:18 }}>
             {loading
               ?[1,2,3,4].map(i=><Skeleton key={i} />)
               :articles.length>0
                 ?articles.map((a,i)=><ArticleRow key={a.id??i} article={a} />)
                 :(
-                  <div style={{ background:"var(--card)",borderRadius:18,padding:52,textAlign:"center",border:"1px solid var(--border-light)" }}>
+                  <div className="side-card" style={{ padding:56,textAlign:"center" }}>
                     <div style={{ fontSize:44,marginBottom:14 }}>✍️</div>
                     <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"var(--ink)",marginBottom:8 }}>
                       {search?"No results found":"No articles yet"}
@@ -305,30 +309,24 @@ function BlogContent() {
           </div>
 
           {/* Sidebar */}
-          <aside style={{ display:"flex",flexDirection:"column",gap:16,position:"sticky",top:150 }}>
-            <div style={{ background:"var(--card)",borderRadius:14,padding:18,border:"1px solid var(--border-light)" }}>
-              <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"var(--ink-light)",marginBottom:10,paddingBottom:8,borderBottom:"1px solid var(--border-light)" }}>Life & Personal</div>
+          <aside style={{ display:"flex",flexDirection:"column",gap:16,position:"sticky",top:96 }}>
+            <div className="side-card">
+              <div className="side-title">Life & Personal</div>
               {LIFE_CATS.map(c=>(
-                <button key={c.value} onClick={()=>handleCat(c.value)}
-                  style={{ width:"100%",textAlign:"left",padding:"7px 10px",borderRadius:8,border:"none",background:category===c.value?"var(--primary-light)":"transparent",color:category===c.value?"#4F46E5":"var(--ink-muted)",fontSize:13,fontWeight:category===c.value?700:400,cursor:"pointer",display:"flex",alignItems:"center",gap:8,fontFamily:"inherit",transition:"all 0.13s" }}
-                  onMouseEnter={e=>{if(category!==c.value)(e.currentTarget as HTMLElement).style.background="var(--cream)"}}
-                  onMouseLeave={e=>{if(category!==c.value)(e.currentTarget as HTMLElement).style.background="transparent"}}>
-                  {c.icon} {c.label}
+                <button key={c.value} onClick={()=>handleCat(c.value)} className={`side-item${category===c.value?" is-active":""}`}>
+                  <span className="si-icon" aria-hidden>{c.icon}</span>{c.label}
                 </button>
               ))}
             </div>
-            <div style={{ background:"var(--card)",borderRadius:14,padding:18,border:"1px solid var(--border-light)" }}>
-              <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"var(--ink-light)",marginBottom:10,paddingBottom:8,borderBottom:"1px solid var(--border-light)" }}>Technology</div>
+            <div className="side-card">
+              <div className="side-title">Technology</div>
               {TECH_CATS.map(c=>(
-                <button key={c.value} onClick={()=>handleCat(c.value)}
-                  style={{ width:"100%",textAlign:"left",padding:"7px 10px",borderRadius:8,border:"none",background:category===c.value?"var(--primary-light)":"transparent",color:category===c.value?"#4F46E5":"var(--ink-muted)",fontSize:13,fontWeight:category===c.value?700:400,cursor:"pointer",display:"flex",alignItems:"center",gap:8,fontFamily:"inherit",transition:"all 0.13s" }}
-                  onMouseEnter={e=>{if(category!==c.value)(e.currentTarget as HTMLElement).style.background="var(--cream)"}}
-                  onMouseLeave={e=>{if(category!==c.value)(e.currentTarget as HTMLElement).style.background="transparent"}}>
-                  {c.icon} {c.label}
+                <button key={c.value} onClick={()=>handleCat(c.value)} className={`side-item${category===c.value?" is-active":""}`}>
+                  <span className="si-icon" aria-hidden>{c.icon}</span>{c.label}
                 </button>
               ))}
             </div>
-            <div style={{ background:"linear-gradient(135deg,#1e1b4b,#4F46E5)",borderRadius:14,padding:18 }}>
+            <div style={{ background:"linear-gradient(135deg,#1e1b4b,#4F46E5 70%,#14B8A6 150%)",borderRadius:18,padding:22,boxShadow:"0 14px 34px -16px rgba(79,70,229,0.7)" }}>
               <div style={{ fontSize:14,fontFamily:"'Playfair Display',serif",fontWeight:700,color:"white",marginBottom:6 }}>📬 Newsletter</div>
               <p style={{ fontSize:12,color:"rgba(255,255,255,0.65)",lineHeight:1.6,marginBottom:12 }}>Best articles every Tuesday.</p>
               <input type="email" placeholder="your@email.com" style={{ width:"100%",padding:"8px 12px",borderRadius:8,border:"none",outline:"none",fontSize:13,marginBottom:8,fontFamily:"inherit" }} />

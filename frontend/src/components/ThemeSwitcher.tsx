@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export type ThemePref = "light" | "dark" | "system";
 const STORAGE_KEY = "theme";
@@ -18,10 +18,13 @@ export function applyTheme(pref: ThemePref) {
 }
 
 
-const OPTIONS: { value: ThemePref; icon: string; label: string }[] = [
-  { value: "light",  icon: "☀️", label: "Light" },
-  { value: "dark",   icon: "🌙", label: "Dark" },
-  { value: "system", icon: "💻", label: "System" },
+const svg = (d: ReactNode) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{d}</svg>
+);
+const OPTIONS: { value: ThemePref; icon: ReactNode; label: string }[] = [
+  { value: "light",  label: "Light",  icon: svg(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>) },
+  { value: "dark",   label: "Dark",   icon: svg(<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />) },
+  { value: "system", label: "System", icon: svg(<><rect x="2" y="4" width="20" height="13" rx="2" /><path d="M8 21h8M12 17v4" /></>) },
 ];
 
 export default function ThemeSwitcher() {
@@ -45,18 +48,12 @@ export default function ThemeSwitcher() {
   };
 
   return (
-    <div role="radiogroup" aria-label="Color theme"
-      style={{ display: "flex", gap: 2, padding: 3, borderRadius: 10, border: "1.5px solid var(--border)", background: "var(--card)" }}>
-      {OPTIONS.map(o => {
-        const active = pref === o.value;
-        return (
-          <button key={o.value} role="radio" aria-checked={active} title={`${o.label} theme`} onClick={() => choose(o.value)}
-            style={{ width: 30, height: 26, borderRadius: 7, border: "none", cursor: "pointer", fontSize: 13, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center",
-              background: active ? "var(--primary-light)" : "transparent", boxShadow: active ? "inset 0 0 0 1px var(--primary-border)" : "none", transition: "background 0.15s" }}>
-            <span aria-hidden>{o.icon}</span>
-          </button>
-        );
-      })}
+    <div role="radiogroup" aria-label="Color theme" className="theme-seg">
+      {OPTIONS.map(o => (
+        <button key={o.value} role="radio" aria-checked={pref === o.value} aria-label={`${o.label} theme`} title={`${o.label} theme`} onClick={() => choose(o.value)}>
+          {o.icon}
+        </button>
+      ))}
     </div>
   );
 }

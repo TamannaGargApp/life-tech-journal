@@ -41,6 +41,37 @@ def _serialize(a: Article, detail: bool = False) -> dict:
     return d
 
 
+async def _attach_author_names(db, docs: list) -> None:
+    """Add author_name to each article dict so the site can show who wrote it."""
+    from bson import ObjectId
+    ids = {d.get("author_id") for d in docs if d.get("author_id")}
+    oids = [ObjectId(i) for i in ids if ObjectId.is_valid(i)]
+    names = {}
+    if oids:
+        async for u in db["users"].find({"_id": {"$in": oids}}, {"name": 1}):
+            names[str(u["_id"])] = u.get("name")
+    for d in docs:
+        d["author_name"] = names.get(d.get("author_id")) or "Life & Tech Team"
+
+
+@router.get("/stats")
+async def site_stats():
+    """Live numbers for the home page: published articles, total reads, subscribers, topics."""
+    cached = await cache_get(f"{CACHE_PREFIX}:stats")
+    if cached:
+        return cached
+    from app.core.database import get_db
+    db  = get_db()
+    pub = ArticleStatus.published.value
+    articles = await db["articles"].count_documents({"status": pub})
+    views    = await db["articles"].aggregate([{"$match": {"status": pub}}, {"$group": {"_id": None, "v": {"$sum": "$views"}}}]).to_list(1)
+    subs     = await db["newsletter_subscribers"].count_documents({"is_active": True})
+    topics   = len(await db["articles"].distinct("category_id", {"status": pub}))
+    result = {"articles": articles, "reads": views[0]["v"] if views else 0, "subscribers": subs, "topics": topics}
+    await cache_set(f"{CACHE_PREFIX}:stats", result, ttl=120)
+    return result
+
+
 @router.get("")
 async def list_articles(
     page: int = Query(1, ge=1), size: int = Query(10, ge=1, le=1000),
@@ -79,6 +110,7 @@ async def list_articles(
         if "status" in d and hasattr(d["status"], "value"):
             d["status"] = d["status"].value
         items.append(d)
+    await _attach_author_names(db, items)
 
     result = {"items": items, "total": total, "page": page, "size": size, "pages": max(1, -(-total // size))}
     await cache_set(cache_key, result, ttl=120)
@@ -100,6 +132,7 @@ async def featured_articles():
     for lst in [featured, editors, trending]:
         for d in lst:
             d["id"] = str(d.pop("_id"))
+        await _attach_author_names(db, lst)
     result = {"featured": featured, "editors_pick": editors, "trending": trending}
     await cache_set(f"{CACHE_PREFIX}:featured", result, ttl=300)
     return result
@@ -137,6 +170,7 @@ async def create_article(body: CreateArticleRequest, user: User = Depends(requir
     await article.insert()
     await cache_delete_pattern(f"{CACHE_PREFIX}:list:*")
     await cache_delete(f"{CACHE_PREFIX}:featured")
+    await cache_delete(f"{CACHE_PREFIX}:stats")
     return {"id": str(article.id), "slug": article.slug}
 
 
@@ -156,6 +190,8 @@ async def update_article(article_id: str, body: UpdateArticleRequest, user: User
     await article.update({"$set": update})
     await cache_delete(f"{CACHE_PREFIX}:slug:{article.slug}")
     await cache_delete_pattern(f"{CACHE_PREFIX}:list:*")
+    await cache_delete(f"{CACHE_PREFIX}:featured")
+    await cache_delete(f"{CACHE_PREFIX}:stats")
     return {"message": "Updated"}
 
 
@@ -167,6 +203,8 @@ async def delete_article(article_id: str, user: User = Depends(require_admin)):
     await article.delete()
     await cache_delete(f"{CACHE_PREFIX}:slug:{article.slug}")
     await cache_delete_pattern(f"{CACHE_PREFIX}:list:*")
+    await cache_delete(f"{CACHE_PREFIX}:featured")
+    await cache_delete(f"{CACHE_PREFIX}:stats")
 
 
 @router.post("/{article_id}/like")

@@ -3,7 +3,7 @@ import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 
 // Applies the saved Light / Dark / System theme before the page paints (no flash).
-const themeInitScript = `(function(){try{var p=localStorage.getItem("theme")||"system";var d=p==="dark"||(p==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-theme",d?"dark":"light");}catch(e){}})();`;
+const themeInitScript = `(function(){try{var p=localStorage.getItem("theme")||"dark";var d=p==="dark"||(p==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-theme",d?"dark":"light");}catch(e){}})();`;
 
 export const metadata: Metadata = {
   title: {
@@ -14,6 +14,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://lifetechjournal.com"),
   openGraph: { siteName: "Life & Tech Journal", type: "website" },
   twitter: { card: "summary_large_image" },
+  // Tab icon and phone home-screen icon (files live in frontend/public)
+  icons: {
+    icon: [{ url: "/favicon.ico", sizes: "any" }, { url: "/favicon.png", type: "image/png", sizes: "512x512" }],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
