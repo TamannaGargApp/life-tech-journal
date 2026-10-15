@@ -24,3 +24,5 @@ bcrypt==4.0.1
 ollama
 huggingface_hub
 numpy
+
+# requirement file added in backend as well
