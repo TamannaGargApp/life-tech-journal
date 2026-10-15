@@ -12,13 +12,13 @@ const AISummarizer = dynamic(() => import("@/components/ai/AISummarizer"), { ssr
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
 const CAT_GRAD: Record<string,string> = {
-  ai:               "linear-gradient(135deg,#1e1b4b,#312e81,#14B8A6)",
-  "web-dev":        "linear-gradient(135deg,#134E4A,#0F766E,#14B8A6)",
+  ai:               "linear-gradient(135deg,#17193B,#2A2770,#4D79F6)",
+  "web-dev":        "linear-gradient(135deg,#134E4A,#0F766E,#4D79F6)",
   programming:      "linear-gradient(135deg,#451A03,#92400E,#F59E0B)",
   career:           "linear-gradient(135deg,#500724,#9D174D,#F472B6)",
   "personal-growth":"linear-gradient(135deg,#022C22,#065F46,#10B981)",
   lifestyle:        "linear-gradient(135deg,#450A0A,#991B1B,#F87171)",
-  travel:           "linear-gradient(135deg,#1E1B4B,#3730A3,#818CF8)",
+  travel:           "linear-gradient(135deg,#17193B,#5048D8,#818CF8)",
   marketing:        "linear-gradient(135deg,#2D1B69,#7C3AED,#C4B5FD)",
   cybersecurity:    "linear-gradient(135deg,#0F172A,#1E293B,#475569)",
   "data-science":   "linear-gradient(135deg,#1E3A5F,#1D4ED8,#60A5FA)",
@@ -28,7 +28,7 @@ const CAT_GRAD: Record<string,string> = {
   productivity:     "linear-gradient(135deg,#1E3A5F,#0369A1,#38BDF8)",
   relationships:    "linear-gradient(135deg,#500724,#BE123C,#FDA4AF)",
   cloud:            "linear-gradient(135deg,#0C4A6E,#0369A1,#7DD3FC)",
-  default:          "linear-gradient(135deg,#1e1b4b,#4F46E5,#14B8A6)",
+  default:          "linear-gradient(135deg,#17193B,#6C63F2,#4D79F6)",
 };
 
 const CAT_EMOJI: Record<string,string> = {
@@ -61,7 +61,7 @@ function ReadingProgress() {
   }, []);
   return (
     <div style={{ position:"fixed",top:0,left:0,right:0,height:3,zIndex:999,background:"rgba(0,0,0,0.05)" }}>
-      <div style={{ height:"100%",background:"linear-gradient(90deg,#4F46E5,#14B8A6)",width:`${progress}%`,transition:"width 0.1s" }} />
+      <div style={{ height:"100%",background:"linear-gradient(90deg,#6C63F2,#4D79F6)",width:`${progress}%`,transition:"width 0.1s" }} />
     </div>
   );
 }
@@ -88,7 +88,7 @@ function ShareButtons({ title, slug }: { title:string; slug:string }) {
       {shareItems.map(s=>(
         <a key={s.label} href={s.href} target="_blank" rel="noreferrer"
           style={{ width:34,height:34,borderRadius:8,border:"1.5px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--ink-muted)",fontSize:12,textDecoration:"none",transition:"all 0.15s",fontWeight:700 }}
-          onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor="#4F46E5";(e.currentTarget as HTMLElement).style.color="var(--primary-text)"}}
+          onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor="#6C63F2";(e.currentTarget as HTMLElement).style.color="var(--primary-text)"}}
           onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor="var(--border)";(e.currentTarget as HTMLElement).style.color="var(--ink-muted)"}}>
           {s.icon}
         </a>
@@ -188,7 +188,7 @@ export default function ArticlePage() {
         <div style={{ fontSize:64,marginBottom:24 }}>📭</div>
         <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:36,fontWeight:700,color:"var(--ink)",marginBottom:12 }}>Article Not Found</h1>
         <p style={{ color:"var(--ink-muted)",fontSize:16,marginBottom:32,lineHeight:1.7 }}>The article you're looking for doesn't exist or may have been moved.</p>
-        <Link href="/blog" style={{ background:"#4F46E5",color:"white",padding:"12px 28px",borderRadius:10,fontWeight:700,fontSize:15,textDecoration:"none" }}>Browse All Articles →</Link>
+        <Link href="/blog" style={{ background:"#6C63F2",color:"white",padding:"12px 28px",borderRadius:10,fontWeight:700,fontSize:15,textDecoration:"none" }}>Browse All Articles →</Link>
       </div>
     </div>
   );
@@ -272,7 +272,7 @@ export default function ArticlePage() {
         <article>
           {/* Excerpt pull quote if has image */}
           {article.featured_image && article.excerpt && (
-            <p style={{ fontFamily:"'Playfair Display',serif",fontSize:20,fontStyle:"italic",color:"var(--primary-text)",lineHeight:1.7,marginBottom:36,paddingLeft:20,borderLeft:"3px solid #4F46E5" }}>
+            <p style={{ fontFamily:"'Playfair Display',serif",fontSize:20,fontStyle:"italic",color:"var(--primary-text)",lineHeight:1.7,marginBottom:36,paddingLeft:20,borderLeft:"3px solid #6C63F2" }}>
               {article.excerpt}
             </p>
           )}
@@ -307,8 +307,8 @@ export default function ArticlePage() {
               <button onClick={handleSave}
                 style={{ display:"flex",alignItems:"center",gap:8,padding:"9px 18px",borderRadius:10,border:"1.5px solid",cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,transition:"all 0.2s",
                   background:saved?"var(--primary-light)":"var(--card)",
-                  borderColor:saved?"#4F46E5":"var(--border)",
-                  color:saved?"#4F46E5":"var(--ink-muted)" }}>
+                  borderColor:saved?"#6C63F2":"var(--border)",
+                  color:saved?"#6C63F2":"var(--ink-muted)" }}>
                 {saved?"🔖":"📌"} {saved?"Saved":"Save"}
               </button>
             </div>
@@ -340,7 +340,7 @@ export default function ArticlePage() {
                   return (
                     <Link key={r.id||r.slug} href={`/blog/${r.slug}`} style={{ textDecoration:"none" }}>
                       <div style={{ background:"var(--card)",borderRadius:14,overflow:"hidden",border:"1px solid var(--border-light)",transition:"all 0.2s" }}
-                        onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.boxShadow="0 6px 20px rgba(79,70,229,0.1)";(e.currentTarget as HTMLElement).style.transform="translateY(-3px)"}}
+                        onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.boxShadow="0 6px 20px rgba(108,99,242,0.1)";(e.currentTarget as HTMLElement).style.transform="translateY(-3px)"}}
                         onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.boxShadow="none";(e.currentTarget as HTMLElement).style.transform="translateY(0)"}}>
                         <div style={{ height:100,background:rg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28 }}>{re}</div>
                         <div style={{ padding:"12px 14px" }}>
@@ -393,7 +393,7 @@ export default function ArticlePage() {
           </div>
 
           {/* Newsletter */}
-          <div style={{ background:"linear-gradient(135deg,#1e1b4b,#4F46E5)",borderRadius:16,padding:22 }}>
+          <div style={{ background:"linear-gradient(135deg,#17193B,#6C63F2)",borderRadius:16,padding:22 }}>
             <div style={{ fontSize:22,marginBottom:8 }}>📬</div>
             <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:"white",marginBottom:6 }}>Enjoyed this article?</h3>
             <p style={{ fontSize:12,color:"rgba(255,255,255,0.65)",lineHeight:1.6,marginBottom:14 }}>Get the best stories delivered to your inbox every Tuesday.</p>
@@ -408,7 +408,7 @@ export default function ArticlePage() {
 
       {/* ── Newsletter CTA ── */}
       <div style={{ maxWidth:1100,margin:"60px auto 0",padding:"0 32px" }}>
-        <div style={{ background:"linear-gradient(135deg,#1e1b4b 0%,#4F46E5 55%,#14B8A6 100%)",borderRadius:20,padding:"48px 44px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,flexWrap:"wrap" }}>
+        <div style={{ background:"linear-gradient(135deg,#17193B 0%,#6C63F2 55%,#4D79F6 100%)",borderRadius:20,padding:"48px 44px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,flexWrap:"wrap" }}>
           <div>
             <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:24,fontWeight:700,color:"white",marginBottom:6 }}>Want more articles like this?</h3>
             <p style={{ color:"rgba(255,255,255,0.72)",fontSize:15 }}>Join 12,000+ readers. New stories every Tuesday.</p>
@@ -456,18 +456,98 @@ export default function ArticlePage() {
           color: var(--primary-text); text-decoration: underline; text-underline-offset: 3px;
           font-weight: 600;
         }
-        .article-content a:hover { color: #3730A3; }
+        .article-content a:hover { color: #5048D8; }
         .article-content strong { color: var(--ink); font-weight: 700; }
         .article-content em { font-style: italic; color: var(--ink-mid); }
-        .article-content ul, .article-content ol {
-          margin: 1.25rem 0 1.5rem 1.5rem; padding: 0;
+        /* Bullet points: gradient check badges */
+        .article-content ul {
+          list-style: none; margin: 1.5rem 0 1.75rem; padding: 0;
+          display: grid; gap: 12px;
         }
-        .article-content li {
-          margin-bottom: 0.6rem; line-height: 1.7; color: var(--ink-mid);
+        .article-content ul > li {
+          position: relative; margin: 0; padding: 14px 18px 14px 56px;
+          line-height: 1.7; color: var(--ink-mid);
+          background: var(--surface-2); border: 1px solid var(--border-light);
+          border-radius: 14px;
+          transition: transform .2s ease, border-color .2s ease;
+        }
+        .article-content ul > li:hover { transform: translateX(4px); border-color: rgba(108,99,242,.45); }
+        .article-content ul > li::before {
+          content: ""; position: absolute; left: 16px; top: 15px;
+          width: 26px; height: 26px; border-radius: 8px;
+          background: var(--brand-grad, linear-gradient(135deg,#6C63F2,#4D79F6));
+          box-shadow: 0 4px 12px rgba(108,99,242,.35);
+        }
+        .article-content ul > li::after {
+          content: ""; position: absolute; left: 25px; top: 20px;
+          width: 6px; height: 11px; border: solid #fff; border-width: 0 2.5px 2.5px 0;
+          transform: rotate(45deg);
+        }
+        /* Numbered points: gradient number circles joined by a line */
+        .article-content ol {
+          list-style: none; counter-reset: step; margin: 1.75rem 0 2rem; padding: 0;
+        }
+        .article-content ol > li {
+          counter-increment: step; position: relative;
+          margin: 0; padding: 4px 0 22px 64px; min-height: 48px;
+          line-height: 1.7; color: var(--ink-mid);
+        }
+        .article-content ol > li::before {
+          content: counter(step, decimal-leading-zero);
+          position: absolute; left: 0; top: 0;
+          width: 44px; height: 44px; border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Playfair Display', serif; font-weight: 700; font-size: 16px; color: #fff;
+          background: var(--brand-grad, linear-gradient(135deg,#6C63F2,#4D79F6));
+          box-shadow: 0 6px 18px rgba(108,99,242,.4);
+        }
+        .article-content ol > li:not(:last-child)::after {
+          content: ""; position: absolute; left: 21px; top: 48px; bottom: 4px; width: 2px;
+          background: linear-gradient(180deg, rgba(108,99,242,.55), rgba(77,121,246,.08));
+        }
+        .article-content ol > li > strong:first-child { display: block; font-size: 1.05rem; margin-bottom: 2px; }
+        .article-content li { line-height: 1.7; color: var(--ink-mid); }
+        .article-content.is-poem ul, .article-content.is-poem ol { text-align: left; }
+
+        /* Picture pointers: icon cards in a grid */
+        .article-content .pointer-grid {
+          display: grid; grid-template-columns: repeat(2, 1fr);
+          gap: 16px; margin: 1.75rem 0 2rem;
+        }
+        .article-content .pointer-grid:has(> :nth-child(3n):last-child) { grid-template-columns: repeat(3, 1fr); }
+        .article-content .pointer-grid > .pointer-card:nth-child(odd):last-child { grid-column: 1 / -1; }
+        @media (max-width: 640px) {
+          .article-content .pointer-grid,
+          .article-content .pointer-grid:has(> :nth-child(3n):last-child) { grid-template-columns: 1fr; }
+        }
+        .article-content .pointer-card {
+          background: var(--surface-2); border: 1px solid var(--border-light);
+          border-radius: 18px; padding: 20px;
+          transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+        }
+        .article-content .pointer-card:hover {
+          transform: translateY(-4px); border-color: rgba(108,99,242,.5);
+          box-shadow: 0 14px 34px rgba(108,99,242,.18);
+        }
+        .article-content .pointer-card img {
+          width: 56px; height: 56px; margin: 0 0 12px; border-radius: 14px; box-shadow: none;
+        }
+        .article-content .pointer-card h4 {
+          font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700;
+          color: var(--ink); margin: 0 0 6px;
+        }
+        .article-content .pointer-card p { margin: 0; font-size: 0.95rem; line-height: 1.65; }
+
+        /* Figures inside articles */
+        .article-content figure { margin: 2rem 0 2.25rem; }
+        .article-content figure img { margin: 0; border: 1px solid var(--border-light); }
+        .article-content figcaption {
+          margin-top: 10px; text-align: center; font-size: 13.5px; color: var(--ink-light, var(--ink-mid));
+          font-style: italic;
         }
         .article-content blockquote {
           margin: 2rem 0; padding: 20px 24px;
-          border-left: 4px solid #4F46E5;
+          border-left: 4px solid #6C63F2;
           background: var(--primary-light); border-radius: 0 12px 12px 0;
           font-family: 'Playfair Display', serif;
           font-size: 1.1rem; font-style: italic; color: var(--primary-text);
@@ -502,7 +582,7 @@ export default function ArticlePage() {
           border-radius: 10px; overflow: hidden;
         }
         .article-content th {
-          background: #4F46E5; color: white;
+          background: #6C63F2; color: white;
           padding: 10px 14px; text-align: left; font-size: 13px;
           font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
         }

@@ -1,9 +1,10 @@
 """Seed content that should always exist on the site.
 
-Runs on startup and only inserts articles whose slug is missing, so edits made
-later through the CMS are never overwritten.
+Runs on startup and inserts articles whose slug is missing. An existing article
+is only refreshed when its content is still an earlier seeded version (matched
+by hash), so edits made later through the CMS are never overwritten.
 """
-import re, math
+import re, math, hashlib
 from datetime import datetime
 from app.models.article import Article, ArticleStatus
 from app.models.user import User, UserRole
@@ -26,12 +27,14 @@ AI_ARTICLE_CONTENT = """
 
 <p>Work is where the change is most visible. AI is taking over many repetitive tasks that used to fill people's days: drafting routine emails, summarising long documents, writing first versions of reports, generating code, and answering common customer questions. That does not mean people are no longer needed. In most workplaces, it means the shape of a job is changing.</p>
 
-<ul>
-  <li><strong>Knowledge workers</strong> use AI assistants to research faster, draft documents and analyse data, which frees time for judgement, strategy and relationships.</li>
-  <li><strong>Software developers</strong> write, test and debug code alongside AI tools, shipping features in hours that once took days.</li>
-  <li><strong>Small businesses</strong> can now afford marketing copy, customer support and bookkeeping help that used to require a dedicated team.</li>
-  <li><strong>Creative professionals</strong> use AI to explore ideas quickly, generate mood boards and handle tedious editing, while keeping the final creative decisions for themselves.</li>
-</ul>
+<figure><img src="/images/articles/ai-work.svg" alt="A person working on a laptop alongside a friendly AI assistant" /><figcaption>AI takes the routine tasks so people can focus on judgement and creativity.</figcaption></figure>
+
+<div class="pointer-grid">
+  <div class="pointer-card"><img src="/images/icons/briefcase.svg" alt="" /><h4>Knowledge workers</h4><p>Use AI assistants to research faster, draft documents and analyse data, which frees time for judgement, strategy and relationships.</p></div>
+  <div class="pointer-card"><img src="/images/icons/code.svg" alt="" /><h4>Software developers</h4><p>Write, test and debug code alongside AI tools, shipping features in hours that once took days.</p></div>
+  <div class="pointer-card"><img src="/images/icons/store.svg" alt="" /><h4>Small businesses</h4><p>Can now afford marketing copy, customer support and bookkeeping help that used to require a dedicated team.</p></div>
+  <div class="pointer-card"><img src="/images/icons/palette.svg" alt="" /><h4>Creative professionals</h4><p>Use AI to explore ideas quickly, generate mood boards and handle tedious editing, while keeping the final creative decisions for themselves.</p></div>
+</div>
 
 <p>Some roles will shrink, and new ones are already appearing: people who design AI workflows, check AI output for accuracy, and train systems on specialist knowledge. The most valuable skill in this new environment is not competing with AI but knowing how to work with it well.</p>
 
@@ -51,13 +54,13 @@ AI_ARTICLE_CONTENT = """
 
 <p>Beyond work and school, AI is reshaping the small routines of daily life:</p>
 
-<ul>
-  <li><strong>Communication:</strong> real-time translation and transcription help people talk across languages and make content accessible to people who are deaf or hard of hearing.</li>
-  <li><strong>Accessibility:</strong> AI can describe images and surroundings aloud for people with visual impairments, giving them more independence.</li>
-  <li><strong>Personal finance:</strong> apps categorise spending, predict upcoming bills and warn about unusual activity.</li>
-  <li><strong>Smart homes:</strong> thermostats, lights and assistants learn household routines and cut energy waste.</li>
-  <li><strong>Entertainment:</strong> recommendations help people discover music, films and books they would never have found on their own.</li>
-</ul>
+<div class="pointer-grid">
+  <div class="pointer-card"><img src="/images/icons/chat.svg" alt="" /><h4>Communication</h4><p>Real-time translation and transcription help people talk across languages and make content accessible to people who are deaf or hard of hearing.</p></div>
+  <div class="pointer-card"><img src="/images/icons/eye.svg" alt="" /><h4>Accessibility</h4><p>AI can describe images and surroundings aloud for people with visual impairments, giving them more independence.</p></div>
+  <div class="pointer-card"><img src="/images/icons/wallet.svg" alt="" /><h4>Personal finance</h4><p>Apps categorise spending, predict upcoming bills and warn about unusual activity.</p></div>
+  <div class="pointer-card"><img src="/images/icons/home.svg" alt="" /><h4>Smart homes</h4><p>Thermostats, lights and assistants learn household routines and cut energy waste.</p></div>
+  <div class="pointer-card"><img src="/images/icons/play.svg" alt="" /><h4>Entertainment</h4><p>Recommendations help people discover music, films and books they would never have found on their own.</p></div>
+</div>
 
 <h2>The Bigger Picture: Science, Climate and Society</h2>
 
@@ -136,12 +139,14 @@ YOUTH_ARTICLE_CONTENT = """
 <p>But power does not always look like money, political position, authority, or influence.</p>
 <p>There is another kind of power that is often underestimated:</p>
 <h3>Soft Power.</h3>
-<p>The power to influence people through ideas.</p>
-<p>The power to inspire.</p>
-<p>The power to create.</p>
-<p>The power to educate.</p>
-<p>The power to build communities.</p>
-<p>The power to make people believe that something better is possible.</p>
+<ul>
+  <li>The power to influence people through ideas.</li>
+  <li>The power to inspire.</li>
+  <li>The power to create.</li>
+  <li>The power to educate.</li>
+  <li>The power to build communities.</li>
+  <li>The power to make people believe that something better is possible.</li>
+</ul>
 <p>You don't necessarily need to control people to influence them.</p>
 <p>Sometimes, you simply need to show them a better possibility.</p>
 <p>When someone creates something that genuinely improves people's lives, others naturally begin to notice.</p>
@@ -162,12 +167,14 @@ YOUTH_ARTICLE_CONTENT = """
 <p>It does not mean everyone needs millions of followers.</p>
 <p>It simply means:</p>
 <p><strong>Use whatever power you already have.</strong></p>
-<p>Your knowledge is power.</p>
-<p>Your skills are power.</p>
-<p>Your creativity is power.</p>
-<p>Your technology is power.</p>
-<p>Your voice is power.</p>
-<p>Your time is power.</p>
+<div class="pointer-grid">
+  <div class="pointer-card"><img src="/images/icons/book.svg" alt="" /><h4>Knowledge</h4><p>Your knowledge is power.</p></div>
+  <div class="pointer-card"><img src="/images/icons/tools.svg" alt="" /><h4>Skills</h4><p>Your skills are power.</p></div>
+  <div class="pointer-card"><img src="/images/icons/bulb.svg" alt="" /><h4>Creativity</h4><p>Your creativity is power.</p></div>
+  <div class="pointer-card"><img src="/images/icons/chip.svg" alt="" /><h4>Technology</h4><p>Your technology is power.</p></div>
+  <div class="pointer-card"><img src="/images/icons/megaphone.svg" alt="" /><h4>Voice</h4><p>Your voice is power.</p></div>
+  <div class="pointer-card"><img src="/images/icons/clock.svg" alt="" /><h4>Time</h4><p>Your time is power.</p></div>
+</div>
 <p>And your determination is perhaps one of the most important forms of power you possess.</p>
 <hr />
 <h2>Everyone Has a Plan. But How Will It Happen?</h2>
@@ -193,16 +200,15 @@ YOUTH_ARTICLE_CONTENT = """
 <h2>The Missing Piece: Execution</h2>
 <p>We don't necessarily need more motivational speeches.</p>
 <p>We need more people willing to take the first step.</p>
-<p>You may have an idea for an educational platform.</p>
-<p>Build the first version.</p>
-<p>You may want to solve an environmental problem.</p>
-<p>Start researching and testing solutions.</p>
-<p>You may want to help your local community.</p>
-<p>Start with ten people.</p>
-<p>You may want to use AI to solve a real-world problem.</p>
-<p>Learn the technology and build something.</p>
+<ol>
+  <li>You may have an idea for an educational platform. <strong>Build the first version.</strong></li>
+  <li>You may want to solve an environmental problem. <strong>Start researching and testing solutions.</strong></li>
+  <li>You may want to help your local community. <strong>Start with ten people.</strong></li>
+  <li>You may want to use AI to solve a real-world problem. <strong>Learn the technology and build something.</strong></li>
+</ol>
 <p>It doesn't have to begin at full scale.</p>
 <p>It just has to begin.</p>
+<figure><img src="/images/articles/youth-ideas.svg" alt="An idea growing into a plan, a build and real impact" /><figcaption>From idea to impact: every step only happens once you start.</figcaption></figure>
 <p>Because execution creates something that imagination alone cannot:</p>
 <p><strong>evidence.</strong></p>
 <p>Once you build something, you can learn from it.</p>
@@ -213,12 +219,14 @@ YOUTH_ARTICLE_CONTENT = """
 <h2>Dream With Your Eyes Closed. Build With Them Open.</h2>
 <p>There is a question I think everyone should ask themselves at least once:</p>
 <h3>When you close your eyes and imagine the future, what kind of world do you see?</h3>
-<p>Do you see a world where technology makes people's lives easier?</p>
-<p>A world where education is accessible to everyone?</p>
-<p>A world where healthcare is more affordable?</p>
-<p>A world where people care more about the environment?</p>
-<p>A world where opportunities are not limited by geography?</p>
-<p>A world where humans and technology work together rather than compete?</p>
+<ul>
+  <li>Do you see a world where technology makes people's lives easier?</li>
+  <li>A world where education is accessible to everyone?</li>
+  <li>A world where healthcare is more affordable?</li>
+  <li>A world where people care more about the environment?</li>
+  <li>A world where opportunities are not limited by geography?</li>
+  <li>A world where humans and technology work together rather than compete?</li>
+</ul>
 <p>Whatever that vision is, don't dismiss it simply because it sounds too ambitious.</p>
 <p>Every meaningful change begins with someone imagining that things could be different.</p>
 <p>But there is an important difference between <strong>dreaming about a better world</strong> and <strong>building one.</strong></p>
@@ -229,12 +237,14 @@ YOUTH_ARTICLE_CONTENT = """
 <p>Having an idea is exciting.</p>
 <p>Starting is exciting.</p>
 <p>But continuing is where determination is tested.</p>
-<p>There will be failures.</p>
-<p>People may not understand your idea.</p>
-<p>Some people may tell you it won't work.</p>
-<p>You may lose motivation.</p>
-<p>You may build something that nobody uses.</p>
-<p>You may have to start again.</p>
+<ul>
+  <li>There will be failures.</li>
+  <li>People may not understand your idea.</li>
+  <li>Some people may tell you it won't work.</li>
+  <li>You may lose motivation.</li>
+  <li>You may build something that nobody uses.</li>
+  <li>You may have to start again.</li>
+</ul>
 <p>And sometimes you may question whether the effort is worth it.</p>
 <p>This is where determination matters.</p>
 <p>Determination isn't simply saying:</p>
@@ -253,13 +263,15 @@ YOUTH_ARTICLE_CONTENT = """
 <hr />
 <h2>Technology Has Given Youth Something Previous Generations Never Had</h2>
 <p>Technology has dramatically reduced the distance between an idea and its audience.</p>
-<p>You can learn almost anything.</p>
-<p>You can collaborate with people across the world.</p>
-<p>You can create software from your bedroom.</p>
-<p>You can publish your thoughts instantly.</p>
-<p>You can build a business without a physical office.</p>
-<p>You can use AI to accelerate research, creativity, development, and experimentation.</p>
-<p>You can find people who believe in the same idea as you.</p>
+<ul>
+  <li>You can learn almost anything.</li>
+  <li>You can collaborate with people across the world.</li>
+  <li>You can create software from your bedroom.</li>
+  <li>You can publish your thoughts instantly.</li>
+  <li>You can build a business without a physical office.</li>
+  <li>You can use AI to accelerate research, creativity, development, and experimentation.</li>
+  <li>You can find people who believe in the same idea as you.</li>
+</ul>
 <p>The tools are becoming more accessible.</p>
 <p>The question is increasingly becoming:</p>
 <p><strong>What will we do with them?</strong></p>
@@ -271,14 +283,16 @@ YOUTH_ARTICLE_CONTENT = """
 <p>Perhaps the phrase <em>"change the world"</em> sounds too big.</p>
 <p>So start smaller.</p>
 <p>Change something around you.</p>
-<p>Help one person.</p>
-<p>Solve one problem.</p>
-<p>Teach one skill.</p>
-<p>Build one useful product.</p>
-<p>Create one community.</p>
-<p>Improve one process.</p>
-<p>Protect one piece of nature.</p>
-<p>Give someone an opportunity.</p>
+<ul>
+  <li>Help one person.</li>
+  <li>Solve one problem.</li>
+  <li>Teach one skill.</li>
+  <li>Build one useful product.</li>
+  <li>Create one community.</li>
+  <li>Improve one process.</li>
+  <li>Protect one piece of nature.</li>
+  <li>Give someone an opportunity.</li>
+</ul>
 <p>One meaningful action may seem insignificant.</p>
 <p>But imagine thousands—or millions—of young people doing this consistently.</p>
 <p>That is when individual actions begin to become collective change.</p>
@@ -294,12 +308,14 @@ YOUTH_ARTICLE_CONTENT = """
 <p>So if you have an idea, don't wait for the perfect moment.</p>
 <p>If you have a dream, don't wait until you feel completely ready.</p>
 <p>If you see a problem, don't assume someone else will solve it.</p>
-<p>Start.</p>
-<p>Learn.</p>
-<p>Build.</p>
-<p>Fail.</p>
-<p>Improve.</p>
-<p>Continue.</p>
+<ol>
+  <li><strong>Start</strong></li>
+  <li><strong>Learn</strong></li>
+  <li><strong>Build</strong></li>
+  <li><strong>Fail</strong></li>
+  <li><strong>Improve</strong></li>
+  <li><strong>Continue</strong></li>
+</ol>
 <p>Because the world doesn't need another generation that only talks about change.</p>
 <p><strong>It needs a generation that executes it.</strong></p>
 <hr />
@@ -326,6 +342,7 @@ SEED_ARTICLES = [
     dict(
         title="How AI is reshaping the world and people's lives",
         slug=AI_ARTICLE_SLUG,
+        featured_image="/images/articles/ai-hero.svg",
         excerpt="From work and healthcare to education and daily routines, a clear look at how artificial intelligence is changing the world, and how to thrive alongside it.",
         content=AI_ARTICLE_CONTENT,
         category_id="ai",
@@ -338,6 +355,7 @@ SEED_ARTICLES = [
     dict(
         title="Youth Have the Power to Change the World",
         slug=YOUTH_ARTICLE_SLUG,
+        featured_image="/images/articles/youth-hero.svg",
         excerpt="Youth have ideas, energy and technology on their side. The real question is what we do with that power, and the missing piece is execution.",
         content=YOUTH_ARTICLE_CONTENT,
         category_id="motivation",
@@ -350,10 +368,33 @@ SEED_ARTICLES = [
 ]
 
 
+# SHA-256 of earlier seeded content, per slug. Articles still holding one of these
+# were never edited by hand, so they can safely get the latest seeded version.
+PREVIOUS_SEED_HASHES = {
+    AI_ARTICLE_SLUG: {"9946a980f6d7a1ed909df0d5f9f6e04ace8486c431430d05f14b5402ed233ad4"},
+    YOUTH_ARTICLE_SLUG: {"f5da1f5255266578d0497686f561605f52ce4e0a9dd705d3a4e724ef03c9e73f"},
+}
+
+
+def _hash(text: str) -> str:
+    return hashlib.sha256((text or "").strip().encode()).hexdigest()
+
+
 async def seed_articles() -> None:
     admin = await User.find_one(User.role == UserRole.admin)
     for data in SEED_ARTICLES:
-        if await Article.find_one(Article.slug == data["slug"]):
+        existing = await Article.find_one(Article.slug == data["slug"])
+        if existing:
+            changed = False
+            if existing.content != data["content"] and _hash(existing.content) in PREVIOUS_SEED_HASHES.get(data["slug"], set()):
+                existing.content = data["content"]
+                existing.read_time = _read_time(data["content"])
+                changed = True
+            if not existing.featured_image and data.get("featured_image"):
+                existing.featured_image = data["featured_image"]
+                changed = True
+            if changed:
+                await existing.save()
             continue
         await Article(
             **data,

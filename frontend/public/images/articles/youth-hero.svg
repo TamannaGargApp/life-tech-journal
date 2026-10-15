@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-label="Young people walking towards a rising sun over an open road">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B1650"/><stop offset=".55" stop-color="#6C63F2"/><stop offset="1" stop-color="#F59E9E"/></linearGradient>
+    <radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE7A3"/><stop offset=".6" stop-color="#FDBA74"/><stop offset="1" stop-color="#FB923C" stop-opacity="0"/></radialGradient>
+    <linearGradient id="hill1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A2770"/><stop offset="1" stop-color="#11132E"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDE68A" stop-opacity=".9"/><stop offset="1" stop-color="#4D79F6" stop-opacity=".35"/></linearGradient>
+  </defs>
+  <rect width="1600" height="700" fill="url(#sky)"/>
+  <circle cx="800" cy="430" r="260" fill="url(#sun)"/>
+  <circle cx="800" cy="430" r="120" fill="#FFE7A3" opacity=".95"/>
+  <g stroke="#FFE7A3" stroke-width="6" stroke-linecap="round" opacity=".7">
+    <path d="M800 230v-50M660 290l-35-35M940 290l35-35M600 430h-55M1000 430h55"/>
+  </g>
+  <path d="M0 470C200 400 380 440 560 470S960 420 1160 450 1500 410 1600 430V700H0Z" fill="#3B3592" opacity=".75"/>
+  <path d="M0 540C240 480 420 520 640 540S1040 500 1280 520 1520 500 1600 510V700H0Z" fill="url(#hill1)"/>
+  <path d="M760 520 L840 520 L1060 700 L540 700 Z" fill="url(#road)"/>
+  <path d="M800 540 L800 700" stroke="#FFFFFF" stroke-opacity=".5" stroke-width="5" stroke-dasharray="22 20"/>
+  <g fill="#0B0E24">
+    <g transform="translate(700 560)"><circle cx="0" cy="-58" r="13"/><path d="M-12 -42h24l6 40h-10l-4 42h-8l-2-30-2 30h-8l-4-42h-10z"/></g>
+    <g transform="translate(772 575) scale(.9)"><circle cx="0" cy="-58" r="13"/><path d="M-12 -42h24l6 40h-10l-4 42h-8l-2-30-2 30h-8l-4-42h-10z"/><path d="M12 -38l26 -26" stroke="#0B0E24" stroke-width="7" stroke-linecap="round"/></g>
+    <g transform="translate(860 565)"><circle cx="0" cy="-58" r="13"/><path d="M-14 -42h28l10 46h-12l-4 36h-8l-4-28-4 28h-8l-4-36h-12z"/></g>
+    <g transform="translate(925 580) scale(.85)"><circle cx="0" cy="-58" r="13"/><path d="M-12 -42h24l6 40h-10l-4 42h-8l-2-30-2 30h-8l-4-42h-10z"/></g>
+  </g>
+  <g fill="#FFE7A3" opacity=".9"><circle cx="300" cy="140" r="3"/><circle cx="420" cy="90" r="2"/><circle cx="1180" cy="120" r="3"/><circle cx="1320" cy="190" r="2"/><circle cx="1460" cy="90" r="2.5"/><circle cx="160" cy="220" r="2"/></g>
+</svg>

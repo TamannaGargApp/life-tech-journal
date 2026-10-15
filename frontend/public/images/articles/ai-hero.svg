@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-label="A glowing neural network connecting people, work and the world">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B0E24"/><stop offset=".55" stop-color="#1E1B5C"/><stop offset="1" stop-color="#173C8C"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#8B7CF8" stop-opacity=".9"/><stop offset="1" stop-color="#6C63F2" stop-opacity="0"/></radialGradient>
+    <linearGradient id="line" x1="0" x2="1"><stop offset="0" stop-color="#6C63F2"/><stop offset="1" stop-color="#4D79F6"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#8B7CF8" stroke-opacity=".08"/></pattern>
+  </defs>
+  <rect width="1600" height="700" fill="url(#bg)"/>
+  <rect width="1600" height="700" fill="url(#grid)"/>
+  <circle cx="800" cy="350" r="330" fill="url(#glow)" opacity=".55"/>
+  <g fill="none" stroke="#8B7CF8" stroke-opacity=".25"><circle cx="800" cy="350" r="190"/><circle cx="800" cy="350" r="290"/><circle cx="800" cy="350" r="400"/></g>
+  <g stroke="url(#line)" stroke-width="2.5" stroke-opacity=".75" fill="none">
+    <path d="M800 350L560 200M800 350L1040 200M800 350L520 470M800 350L1080 480M800 350L800 110M800 350L800 600M560 200L330 150M1040 200L1270 140M520 470L300 540M1080 480L1310 560M560 200L520 470M1040 200L1080 480M330 150L300 540M1270 140L1310 560"/>
+  </g>
+  <g fill="#0B0E24" stroke="#A99CFF" stroke-width="3">
+    <circle cx="560" cy="200" r="34"/><circle cx="1040" cy="200" r="34"/><circle cx="520" cy="470" r="34"/><circle cx="1080" cy="480" r="34"/><circle cx="800" cy="110" r="26"/><circle cx="800" cy="600" r="26"/>
+    <circle cx="330" cy="150" r="20"/><circle cx="1270" cy="140" r="20"/><circle cx="300" cy="540" r="20"/><circle cx="1310" cy="560" r="20"/>
+  </g>
+  <g font-family="Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji, sans-serif" font-size="30" text-anchor="middle" dominant-baseline="central">
+    <text x="560" y="201">💼</text><text x="1040" y="201">🩺</text><text x="520" y="471">🎓</text><text x="1080" y="481">🏡</text><text x="800" y="111" font-size="22">🌍</text><text x="800" y="601" font-size="22">🔬</text>
+  </g>
+  <circle cx="800" cy="350" r="92" fill="#13163A" stroke="url(#line)" stroke-width="5"/>
+  <g fill="none" stroke="#C4B8FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M770 310c-22 0-34 18-30 36-14 8-14 34 4 42 0 18 18 28 34 22M830 310c22 0 34 18 30 36 14 8 14 34-4 42 0 18-18 28-34 22M800 300v100M770 340h30M800 370h30"/>
+  </g>
+  <g fill="#C4B8FF"><circle cx="770" cy="340" r="6"/><circle cx="830" cy="370" r="6"/></g>
+</svg>

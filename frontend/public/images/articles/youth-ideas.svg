@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-label="From idea to execution: a lightbulb, a plan, a build and a community">
+  <defs>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17193B"/><stop offset="1" stop-color="#2A2770"/></linearGradient>
+    <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#FDBA74"/><stop offset=".5" stop-color="#8B7CF8"/><stop offset="1" stop-color="#4D79F6"/></linearGradient>
+  </defs>
+  <rect width="1200" height="520" fill="url(#b)"/>
+  <path d="M150 300 C 330 180, 470 400, 600 280 S 900 160, 1050 260" fill="none" stroke="url(#g)" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 18"/>
+  <g font-family="Lato, Segoe UI, sans-serif" text-anchor="middle">
+    <g transform="translate(150 300)"><circle r="70" fill="#13163A" stroke="#FDBA74" stroke-width="5"/><text y="16" font-size="56">💡</text><text y="120" font-size="24" font-weight="700" fill="#FDE68A">Idea</text></g>
+    <g transform="translate(450 300)"><circle r="70" fill="#13163A" stroke="#C084FC" stroke-width="5"/><text y="16" font-size="56">📝</text><text y="120" font-size="24" font-weight="700" fill="#E9D5FF">Plan</text></g>
+    <g transform="translate(750 250)"><circle r="70" fill="#13163A" stroke="#8B7CF8" stroke-width="5"/><text y="16" font-size="56">🛠️</text><text y="120" font-size="24" font-weight="700" fill="#C4B8FF">Build</text></g>
+    <g transform="translate(1050 260)"><circle r="70" fill="#13163A" stroke="#4D79F6" stroke-width="5"/><text y="16" font-size="56">🌍</text><text y="120" font-size="24" font-weight="700" fill="#BFD3FF">Impact</text></g>
+    <text x="600" y="80" font-size="30" font-weight="800" fill="#FFFFFF">Dreams become real through execution</text>
+  </g>
+</svg>
