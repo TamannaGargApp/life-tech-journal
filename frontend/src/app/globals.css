@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap');
 
+/* Hindi (Devanagari) text: Playfair Display and Lato have no Hindi letters, so the same
+   font names borrow Noto Devanagari for just that script. Covers every heading and body text. */
+@font-face { font-family: 'Playfair Display'; src: url('/fonts/noto-serif-devanagari.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+@font-face { font-family: 'Playfair Display'; src: url('/fonts/noto-serif-devanagari.woff2') format('woff2'); font-weight: 100 900; font-style: italic; font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+@font-face { font-family: 'Lato'; src: url('/fonts/noto-sans-devanagari.woff2') format('woff2'); font-weight: 100 900; font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -427,3 +433,15 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) { .hp-rings span, .hp-section-reveal { animation: none !important; } }
 .hp-hero-card { position: relative; z-index: 1; }
 .hp-float { z-index: 2; }
+
+/* Footer social icons */
+.footer-social {
+  width: 40px; height: 40px; border-radius: 11px; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-light); text-decoration: none;
+  transition: transform .2s ease, color .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.footer-social:hover { transform: translateY(-3px); color: #fff; border-color: transparent; }
+.footer-social.is-instagram:hover { background: linear-gradient(45deg,#F58529,#DD2A7B 50%,#8134AF); box-shadow: 0 8px 20px rgba(221,42,123,.35); }
+.footer-social.is-youtube:hover   { background: #FF0033; box-shadow: 0 8px 20px rgba(255,0,51,.35); }
+.footer-social.is-gallery:hover   { background: var(--brand-grad); box-shadow: 0 8px 20px rgba(108,99,242,.4); }

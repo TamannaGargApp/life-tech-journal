@@ -12,9 +12,16 @@ const AIWritingAssistant = dynamic(() => import("@/components/ai/AIWritingAssist
 const AINewsLetterCurator = dynamic(() => import("@/components/ai/AINewsLetterCurator"), { ssr:false });
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
-const ADMIN_PASSWORD  = process.env.NEXT_PUBLIC_ADMIN_UI_PASSWORD ?? "";
-const ADMIN_API_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL        ?? "";
-const ADMIN_API_PASS  = process.env.NEXT_PUBLIC_ADMIN_PASSWORD      ?? "";
+
+// Checks a token with the backend and returns null when it belongs to an admin or author,
+// otherwise a message saying why the admin panel can't be opened.
+async function checkAdminToken(token:string): Promise<string|null> {
+  const res = await fetch(`${API}/auth/me`, { headers:{ Authorization:`Bearer ${token}` } });
+  if (!res.ok) return "Your session has expired. Please sign in again.";
+  const me = await res.json();
+  if (me.role==="admin"||me.role==="author") return null;
+  return `${me.email} is signed in as a reader. Set ADMIN_EMAIL and ADMIN_PASSWORD in backend/.env and restart the backend to make it an admin.`;
+}
 
 const CATS = [
   { value:"personal-growth", label:"Personal Growth", group:"Life" },
@@ -41,18 +48,18 @@ const CAT_GRAD: Record<string,string> = {
   lifestyle:"linear-gradient(135deg,#450A0A,#991B1B,#F87171)",
   relationships:"linear-gradient(135deg,#500724,#BE123C,#FDA4AF)",
   productivity:"linear-gradient(135deg,#1E3A5F,#0369A1,#38BDF8)",
-  travel:"linear-gradient(135deg,#1E1B4B,#3730A3,#818CF8)",
+  travel:"linear-gradient(135deg,#17193B,#5048D8,#818CF8)",
   motivation:"linear-gradient(135deg,#451A03,#B45309,#FCD34D)",
   "musings":"linear-gradient(135deg,#4A044E,#A21CAF,#F0ABFC)",
   poems:"linear-gradient(135deg,#3B0764,#BE185D,#FDA4AF)",
-  ai:"linear-gradient(135deg,#1e1b4b,#312e81,#14B8A6)",
+  ai:"linear-gradient(135deg,#17193B,#2A2770,#4D79F6)",
   programming:"linear-gradient(135deg,#451A03,#92400E,#F59E0B)",
-  "web-dev":"linear-gradient(135deg,#134E4A,#0F766E,#14B8A6)",
+  "web-dev":"linear-gradient(135deg,#134E4A,#0F766E,#4D79F6)",
   marketing:"linear-gradient(135deg,#2D1B69,#7C3AED,#C4B5FD)",
   cybersecurity:"linear-gradient(135deg,#0F172A,#1E293B,#475569)",
   cloud:"linear-gradient(135deg,#0C4A6E,#0369A1,#7DD3FC)",
   "data-science":"linear-gradient(135deg,#1E3A5F,#1D4ED8,#60A5FA)",
-  default:"linear-gradient(135deg,#1e1b4b,#4F46E5,#14B8A6)",
+  default:"linear-gradient(135deg,#17193B,#6C63F2,#4D79F6)",
 };
 
 type View = "dashboard"|"articles"|"editor"|"seo"|"analytics"|"newsletter"|"settings";
@@ -65,40 +72,31 @@ interface Article {
 }
 
 // ── Admin Login ───────────────────────────────────────────────────────────────
-function AdminLogin({ onLogin }: { onLogin:(token:string)=>void }) {
-  const [mode,    setMode]    = useState<"password"|"account">("password");
-  const [pw,      setPw]      = useState("");
+function AdminLogin({ onLogin, notice }: { onLogin:(token:string)=>void; notice?:string }) {
   const [email,   setEmail]   = useState("");
   const [pass,    setPass]    = useState("");
-  const [err,     setErr]     = useState("");
+  const [err,     setErr]     = useState(notice??"");
   const [loading, setLoading] = useState(false);
 
-  const handlePassword = async () => {
-    if (!ADMIN_PASSWORD) { setErr("Admin password is not configured in frontend/.env"); return; }
-    if (pw !== ADMIN_PASSWORD) { setErr("Incorrect admin password"); return; }
-    setLoading(true);
-    try {
-      const res  = await fetch(`${API}/auth/login`, { method:"POST", headers:{"Content-Type":"application/json"}, credentials:"include", body:JSON.stringify({ email:ADMIN_API_EMAIL, password:ADMIN_API_PASS }) });
-      if (res.ok) { const d = await res.json(); sessionStorage.setItem("access_token", d.access_token); }
-    } catch {}
-    sessionStorage.setItem("admin_local","true");
-    setLoading(false);
-    onLogin("local");
-  };
-
   const handleAccount = async () => {
-    if (!email||!pass) { setErr("Fill in all fields"); return; }
+    if (!email||!pass) { setErr("Enter your admin email and password"); return; }
     setLoading(true); setErr("");
     try {
-      const res  = await fetch(`${API}/auth/login`, { method:"POST", headers:{"Content-Type":"application/json"}, credentials:"include", body:JSON.stringify({ email, password:pass }) });
-      const data = await res.json();
-      if (!res.ok) { setErr(data.detail??"Login failed"); setLoading(false); return; }
+      const res  = await fetch(`${API}/auth/login`, { method:"POST", headers:{"Content-Type":"application/json"}, credentials:"include", body:JSON.stringify({ email:email.trim(), password:pass }) });
+      const data = await res.json().catch(()=>({}));
+      if (!res.ok) {
+        setErr(res.status===401 ? "Wrong email or password. The admin login is ADMIN_EMAIL / ADMIN_PASSWORD from backend/.env." : (data.detail??"Login failed"));
+        setLoading(false); return;
+      }
+      const problem = await checkAdminToken(data.access_token);
+      if (problem) { setErr(problem); setLoading(false); return; }
       sessionStorage.setItem("access_token", data.access_token);
       onLogin(data.access_token);
-    } catch { setErr(`Cannot connect to backend at ${API}`); }
+    } catch { setErr(`Cannot connect to the backend at ${API}. Is it running?`); }
     setLoading(false);
   };
 
+  const input = { width:"100%",padding:"11px 14px",borderRadius:10,border:"1.5px solid rgba(255,255,255,0.1)",background:"rgba(255,255,255,0.05)",color:"white",fontSize:14,outline:"none",fontFamily:"inherit" } as const;
   return (
     <div style={{ minHeight:"100vh",background:"#0f172a",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Lato,sans-serif" }}>
       <div style={{ width:380,background:"#1e293b",borderRadius:20,padding:36,border:"1px solid rgba(255,255,255,0.08)" }}>
@@ -106,43 +104,16 @@ function AdminLogin({ onLogin }: { onLogin:(token:string)=>void }) {
           <div style={{ display:"flex",justifyContent:"center",marginBottom:8 }}><SiteLogo height={96} variant="dark" /></div>
           <div style={{ fontSize:11,letterSpacing:"0.15em",textTransform:"uppercase",color:"rgba(255,255,255,0.3)" }}>Admin Panel</div>
         </div>
-        <div style={{ display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:10,padding:3,marginBottom:24 }}>
-          {[["password","🔑 Quick Access"],["account","👤 Account"]].map(([m,label])=>(
-            <button key={m} onClick={()=>{setMode(m as any);setErr("");}}
-              style={{ flex:1,padding:"8px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:600,transition:"all 0.15s",
-                background:mode===m?"#6366f1":"transparent",color:mode===m?"white":"rgba(255,255,255,0.4)" }}>
-              {label}
-            </button>
-          ))}
+        <p style={{ fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:14,lineHeight:1.6 }}>Sign in with the admin account set in <code style={{ color:"#818CF8" }}>backend/.env</code>.</p>
+        <div style={{ display:"flex",flexDirection:"column",gap:10,marginBottom:12 }}>
+          <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="admin email" autoComplete="username" style={input} />
+          <input type="password" value={pass} onChange={e=>setPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleAccount()} placeholder="password" autoComplete="current-password" style={input} />
         </div>
-        {mode==="password" ? (
-          <>
-            <p style={{ fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:12,lineHeight:1.6 }}>Enter the admin password to access the dashboard.</p>
-            <label style={{ fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"rgba(255,255,255,0.4)",display:"block",marginBottom:6 }}>Admin Password</label>
-            <input type="password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handlePassword()} placeholder="Enter admin password"
-              style={{ width:"100%",padding:"11px 14px",borderRadius:10,border:"1.5px solid rgba(255,255,255,0.1)",background:"rgba(255,255,255,0.05)",color:"white",fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:6 }} />
-            <p style={{ fontSize:11,color:"rgba(255,255,255,0.2)",marginBottom:14 }}>Configured from <code style={{ color:"#818CF8" }}>frontend/.env</code></p>
-            {err && <div style={{ background:"rgba(239,68,68,0.15)",border:"1px solid rgba(239,68,68,0.3)",borderRadius:8,padding:"8px 12px",fontSize:13,color:"#fca5a5",marginBottom:12 }}>⚠ {err}</div>}
-            <button onClick={handlePassword} disabled={loading}
-              style={{ width:"100%",padding:"12px",background:"#6366f1",color:"white",border:"none",borderRadius:10,fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit" }}>
-              {loading?"Signing in…":"Enter Admin Panel →"}
-            </button>
-          </>
-        ) : (
-          <>
-            <div style={{ display:"flex",flexDirection:"column",gap:10,marginBottom:12 }}>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="your@email.com"
-                style={{ width:"100%",padding:"11px 14px",borderRadius:10,border:"1.5px solid rgba(255,255,255,0.1)",background:"rgba(255,255,255,0.05)",color:"white",fontSize:14,outline:"none",fontFamily:"inherit" }} />
-              <input type="password" value={pass} onChange={e=>setPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleAccount()} placeholder="••••••••"
-                style={{ width:"100%",padding:"11px 14px",borderRadius:10,border:"1.5px solid rgba(255,255,255,0.1)",background:"rgba(255,255,255,0.05)",color:"white",fontSize:14,outline:"none",fontFamily:"inherit" }} />
-            </div>
-            {err && <div style={{ background:"rgba(239,68,68,0.15)",border:"1px solid rgba(239,68,68,0.3)",borderRadius:8,padding:"8px 12px",fontSize:13,color:"#fca5a5",marginBottom:12 }}>⚠ {err}</div>}
-            <button onClick={handleAccount} disabled={loading}
-              style={{ width:"100%",padding:"12px",background:"#6366f1",color:"white",border:"none",borderRadius:10,fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit" }}>
-              {loading?"Signing in…":"Sign In →"}
-            </button>
-          </>
-        )}
+        {err && <div style={{ background:"rgba(239,68,68,0.15)",border:"1px solid rgba(239,68,68,0.3)",borderRadius:8,padding:"8px 12px",fontSize:13,color:"#fca5a5",marginBottom:12,lineHeight:1.5 }}>⚠ {err}</div>}
+        <button onClick={handleAccount} disabled={loading}
+          style={{ width:"100%",padding:"12px",background:"#7C6CF6",color:"white",border:"none",borderRadius:10,fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit" }}>
+          {loading?"Signing in…":"Sign In →"}
+        </button>
       </div>
     </div>
   );
@@ -169,12 +140,12 @@ function Sidebar({ view, setView, counts, onLogout }: { view:View; setView:(v:Vi
         {items.map(item=>(
           <button key={item.id} onClick={()=>setView(item.id as View)}
             style={{ width:"100%",textAlign:"left",padding:"9px 12px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"space-between",fontSize:13,fontWeight:600,marginBottom:2,transition:"all 0.13s",
-              background:view===item.id?"rgba(99,102,241,0.25)":"transparent",
+              background:view===item.id?"rgba(124,108,246,0.25)":"transparent",
               color:view===item.id?"#818CF8":"rgba(255,255,255,0.5)" }}
             onMouseEnter={e=>{if(view!==item.id)(e.currentTarget as HTMLElement).style.background="rgba(255,255,255,0.05)"}}
             onMouseLeave={e=>{if(view!==item.id)(e.currentTarget as HTMLElement).style.background="transparent"}}>
             <div style={{ display:"flex",alignItems:"center",gap:9 }}><span style={{ fontSize:15 }}>{item.icon}</span>{item.label}</div>
-            {(item as any).badge>0&&<span style={{ background:"rgba(99,102,241,0.3)",color:"#818CF8",fontSize:10,fontWeight:700,padding:"2px 7px",borderRadius:100 }}>{(item as any).badge}</span>}
+            {(item as any).badge>0&&<span style={{ background:"rgba(124,108,246,0.3)",color:"#818CF8",fontSize:10,fontWeight:700,padding:"2px 7px",borderRadius:100 }}>{(item as any).badge}</span>}
           </button>
         ))}
       </nav>
@@ -210,11 +181,11 @@ function Dashboard({ articles, onNew }: { articles:Article[]; onNew:()=>void }) 
           <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:26,fontWeight:700,color:"var(--ink)" }}>Dashboard</h1>
           <p style={{ color:"var(--ink-light)",fontSize:13,marginTop:3 }}>{new Date().toLocaleDateString("en-IN",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</p>
         </div>
-        <button onClick={onNew} style={{ background:"#6366f1",color:"white",border:"none",borderRadius:10,padding:"10px 20px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(99,102,241,0.3)" }}>+ New Article</button>
+        <button onClick={onNew} style={{ background:"#7C6CF6",color:"white",border:"none",borderRadius:10,padding:"10px 20px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(124,108,246,0.3)" }}>+ New Article</button>
       </div>
       <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:28 }}>
-        <StatCard icon="📝" value={articles.length} label="Total Articles" color="#6366f1" sub={`${published} published`} />
-        <StatCard icon="👁️" value={views.toLocaleString()} label="Total Views" color="#14b8a6" />
+        <StatCard icon="📝" value={articles.length} label="Total Articles" color="#7C6CF6" sub={`${published} published`} />
+        <StatCard icon="👁️" value={views.toLocaleString()} label="Total Views" color="#4D79F6" />
         <StatCard icon="❤️" value={likes.toLocaleString()} label="Total Likes" color="#f43f5e" />
         <StatCard icon="📋" value={drafts} label="Drafts" color="#f59e0b" />
       </div>
@@ -223,7 +194,7 @@ function Dashboard({ articles, onNew }: { articles:Article[]; onNew:()=>void }) 
           <div style={{ fontSize:48,marginBottom:16 }}>✍️</div>
           <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"var(--ink)",marginBottom:8 }}>No articles yet</h3>
           <p style={{ color:"var(--ink-light)",marginBottom:24,fontSize:14 }}>Create your first article to get started.</p>
-          <button onClick={onNew} style={{ background:"#6366f1",color:"white",border:"none",borderRadius:10,padding:"12px 28px",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"inherit" }}>Write Your First Article →</button>
+          <button onClick={onNew} style={{ background:"#7C6CF6",color:"white",border:"none",borderRadius:10,padding:"12px 28px",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"inherit" }}>Write Your First Article →</button>
         </div>
       ):(
         <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20 }}>
@@ -251,11 +222,11 @@ function Dashboard({ articles, onNew }: { articles:Article[]; onNew:()=>void }) 
             <div style={{ padding:"16px 20px",borderBottom:"1px solid var(--border-light)",fontWeight:700,fontSize:14,color:"var(--ink)" }}>Top Performing</div>
             {[...articles].sort((a,b)=>b.views-a.views).slice(0,6).map((a,i)=>(
               <div key={a.id} style={{ padding:"12px 20px",borderBottom:"1px solid var(--border-light)",display:"flex",alignItems:"center",gap:10 }}>
-                <div style={{ width:22,height:22,borderRadius:"50%",background:i<2?"#6366f1":"var(--border-light)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:i<2?"white":"var(--ink-muted)",flexShrink:0 }}>{i+1}</div>
+                <div style={{ width:22,height:22,borderRadius:"50%",background:i<2?"#7C6CF6":"var(--border-light)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:i<2?"white":"var(--ink-muted)",flexShrink:0 }}>{i+1}</div>
                 <div style={{ flex:1,minWidth:0 }}>
                   <div style={{ fontSize:13,fontWeight:600,color:"var(--ink)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{a.title}</div>
                 </div>
-                <span style={{ fontSize:12,color:"#6366f1",fontWeight:700 }}>👁 {a.views}</span>
+                <span style={{ fontSize:12,color:"#7C6CF6",fontWeight:700 }}>👁 {a.views}</span>
               </div>
             ))}
           </div>
@@ -279,7 +250,7 @@ function ArticlesList({ articles, onEdit, onDelete, onNew }: { articles:Article[
           <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:26,fontWeight:700,color:"var(--ink)" }}>Articles</h1>
           <p style={{ color:"var(--ink-light)",fontSize:13,marginTop:3 }}>{articles.length} total</p>
         </div>
-        <button onClick={onNew} style={{ background:"#6366f1",color:"white",border:"none",borderRadius:10,padding:"9px 20px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit" }}>+ New Article</button>
+        <button onClick={onNew} style={{ background:"#7C6CF6",color:"white",border:"none",borderRadius:10,padding:"9px 20px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit" }}>+ New Article</button>
       </div>
       <div style={{ background:"var(--card)",borderRadius:12,padding:"12px 14px",border:"1px solid var(--border-light)",marginBottom:14,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap" }}>
         <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍  Search…"
@@ -288,7 +259,7 @@ function ArticlesList({ articles, onEdit, onDelete, onNew }: { articles:Article[
           {["","published","draft","archived"].map(s=>(
             <button key={s} onClick={()=>setFilter(s)}
               style={{ padding:"6px 12px",borderRadius:100,fontSize:12,fontWeight:600,border:"1.5px solid",cursor:"pointer",fontFamily:"inherit",
-                borderColor:filter===s?"#6366f1":"var(--border)",background:filter===s?"#6366f1":"var(--card)",color:filter===s?"white":"var(--ink-muted)" }}>
+                borderColor:filter===s?"#7C6CF6":"var(--border)",background:filter===s?"#7C6CF6":"var(--card)",color:filter===s?"white":"var(--ink-muted)" }}>
               {s||"All"}
             </button>
           ))}
@@ -321,7 +292,7 @@ function ArticlesList({ articles, onEdit, onDelete, onNew }: { articles:Article[
               color:a.status==="published"?"#065f46":a.status==="draft"?"#92400e":"var(--ink-muted)" }}>
               {a.status}
             </span>
-            <span style={{ fontSize:12,color:"#6366f1",fontWeight:600 }}>{a.views}</span>
+            <span style={{ fontSize:12,color:"#7C6CF6",fontWeight:600 }}>{a.views}</span>
             <span style={{ fontSize:12,color:"#f43f5e",fontWeight:600 }}>{a.likes}</span>
             <div style={{ display:"flex",gap:4 }}>
               <button onClick={()=>onEdit(a)} style={{ padding:"4px 10px",background:"var(--primary-light)",color:"#3b82f6",border:"none",borderRadius:6,fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit" }}>Edit</button>
@@ -368,7 +339,7 @@ function ImagePanel({ onInsert, onSetBanner, bannerUrl }: { onInsert:(url:string
           {[["banner","🏔️ Banner"],["content","📷 In-Content"]].map(([t,l])=>(
             <button key={t} onClick={()=>setTab(t as any)}
               style={{ padding:"5px 12px",borderRadius:6,border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:600,transition:"all 0.15s",
-                background:tab===t?"#6366f1":"transparent",color:tab===t?"white":"var(--ink-muted)" }}>
+                background:tab===t?"#7C6CF6":"transparent",color:tab===t?"white":"var(--ink-muted)" }}>
               {l}
             </button>
           ))}
@@ -394,12 +365,12 @@ function ImagePanel({ onInsert, onSetBanner, bannerUrl }: { onInsert:(url:string
                 placeholder="https://images.unsplash.com/…"
                 style={{ ...inp,flex:1 }} />
               <button onClick={addBanner}
-                style={{ padding:"9px 14px",background:"#6366f1",color:"white",border:"none",borderRadius:8,fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap" }}>
+                style={{ padding:"9px 14px",background:"#7C6CF6",color:"white",border:"none",borderRadius:8,fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap" }}>
                 Set
               </button>
             </div>
             <p style={{ fontSize:11,color:"var(--ink-light)",marginTop:8 }}>
-              Free: <a href="https://unsplash.com" target="_blank" rel="noreferrer" style={{ color:"#6366f1" }}>Unsplash</a> · <a href="https://pexels.com" target="_blank" rel="noreferrer" style={{ color:"#6366f1" }}>Pexels</a>
+              Free: <a href="https://unsplash.com" target="_blank" rel="noreferrer" style={{ color:"#7C6CF6" }}>Unsplash</a> · <a href="https://pexels.com" target="_blank" rel="noreferrer" style={{ color:"#7C6CF6" }}>Pexels</a>
             </p>
             {recent.length>0&&(
               <div style={{ marginTop:10 }}>
@@ -436,7 +407,7 @@ function ImagePanel({ onInsert, onSetBanner, bannerUrl }: { onInsert:(url:string
               ].map(([label, fn])=>(
                 <button key={label as string} onClick={()=>addContent(fn as any)}
                   style={{ padding:"7px 8px",background:"var(--surface-2)",border:"1px solid var(--border)",borderRadius:7,fontSize:12,fontWeight:600,cursor:"pointer",color:"var(--ink-mid)",fontFamily:"inherit",transition:"all 0.1s",textAlign:"center" }}
-                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="var(--primary-light)";el.style.borderColor="#6366f1";el.style.color="#6366f1"}}
+                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="var(--primary-light)";el.style.borderColor="#7C6CF6";el.style.color="#7C6CF6"}}
                   onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="var(--surface-2)";el.style.borderColor="var(--border)";el.style.color="var(--ink-mid)"}}>
                   {label as string}
                 </button>
@@ -444,7 +415,7 @@ function ImagePanel({ onInsert, onSetBanner, bannerUrl }: { onInsert:(url:string
             </div>
             {/* Quick insert */}
             <button onClick={()=>addContent((u,a)=>`<img src="${u}" alt="${a}" style="width:100%;border-radius:12px;margin:1.5rem 0">`)}
-              style={{ width:"100%",padding:"9px",background:"var(--primary-light)",color:"#6366f1",border:"1.5px solid #c7d2fe",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit" }}>
+              style={{ width:"100%",padding:"9px",background:"var(--primary-light)",color:"#7C6CF6",border:"1.5px solid #c7d2fe",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit" }}>
               + Insert Full Width
             </button>
             {recent.length>0&&(
@@ -460,7 +431,7 @@ function ImagePanel({ onInsert, onSetBanner, bannerUrl }: { onInsert:(url:string
               </div>
             )}
             <p style={{ fontSize:11,color:"var(--ink-light)",marginTop:10 }}>
-              Free: <a href="https://unsplash.com" target="_blank" rel="noreferrer" style={{ color:"#6366f1" }}>Unsplash</a> · <a href="https://pexels.com" target="_blank" rel="noreferrer" style={{ color:"#6366f1" }}>Pexels</a>
+              Free: <a href="https://unsplash.com" target="_blank" rel="noreferrer" style={{ color:"#7C6CF6" }}>Unsplash</a> · <a href="https://pexels.com" target="_blank" rel="noreferrer" style={{ color:"#7C6CF6" }}>Pexels</a>
             </p>
           </div>
         )}
@@ -563,7 +534,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
 
         {msg.text&&<div style={{ padding:"7px 14px",borderRadius:8,fontSize:13,fontWeight:600,background:msg.type==="ok"?"#d1fae5":"#fef2f2",color:msg.type==="ok"?"#065f46":"#ef4444" }}>{msg.type==="ok"?"✅":"⚠"} {msg.text}</div>}
         <button onClick={()=>handleSave(false)} disabled={saving} style={{ padding:"8px 16px",background:"var(--surface-3)",color:"var(--ink-mid)",border:"none",borderRadius:9,fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit" }}>💾 Draft</button>
-        <button onClick={()=>handleSave(true)}  disabled={saving} style={{ padding:"8px 16px",background:"#6366f1",color:"white",border:"none",borderRadius:9,fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(99,102,241,0.3)" }}>{saving?"Saving…":"🚀 Publish"}</button>
+        <button onClick={()=>handleSave(true)}  disabled={saving} style={{ padding:"8px 16px",background:"#7C6CF6",color:"white",border:"none",borderRadius:9,fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(124,108,246,0.3)" }}>{saving?"Saving…":"🚀 Publish"}</button>
       </div>
 
       {/* Tabs */}
@@ -571,7 +542,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
         {(["content","seo","settings"] as const).map(t=>(
           <button key={t} onClick={()=>setTab(t)}
             style={{ padding:"6px 16px",borderRadius:8,border:"none",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",textTransform:"capitalize",transition:"all 0.15s",
-              background:tab===t?"#6366f1":"transparent",color:tab===t?"white":"var(--ink-muted)" }}>
+              background:tab===t?"#7C6CF6":"transparent",color:tab===t?"white":"var(--ink-muted)" }}>
             {t==="content"?"📝 Content":t==="seo"?"🔍 SEO":"⚙️ Settings"}
           </button>
         ))}
@@ -606,7 +577,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
                   <div style={{ display:"flex",background:"var(--surface-2)",border:"1.5px solid var(--border)",borderRadius:9,overflow:"hidden" }}>
                     <span style={{ padding:"10px 12px",color:"var(--ink-light)",fontSize:13,borderRight:"1px solid var(--border)",background:"var(--surface-3)",whiteSpace:"nowrap" }}>/blog/</span>
                     <input value={form.slug} onChange={e=>set("slug",e.target.value)} style={{ flex:1,border:"none",outline:"none",padding:"10px 12px",fontSize:13,fontFamily:"inherit",color:"var(--ink-mid)",background:"transparent" }} />
-                    <button onClick={()=>set("slug",autoSlug(form.title))} style={{ padding:"8px 12px",background:"none",border:"none",color:"#6366f1",cursor:"pointer",fontSize:11,fontWeight:700,fontFamily:"inherit",borderLeft:"1px solid var(--border)" }}>Auto</button>
+                    <button onClick={()=>set("slug",autoSlug(form.title))} style={{ padding:"8px 12px",background:"none",border:"none",color:"#7C6CF6",cursor:"pointer",fontSize:11,fontWeight:700,fontFamily:"inherit",borderLeft:"1px solid var(--border)" }}>Auto</button>
                   </div>
                 </div>
               </div>
@@ -636,7 +607,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
                   {[["H2","<h2>Section Heading</h2>"],["H3","<h3>Sub-heading</h3>"],["Para","<p>Your paragraph text here.</p>"],["Bold","<strong>bold</strong>"],["Italic","<em>italic</em>"],["Link",'<a href="URL">link text</a>'],["List","<ul>\n  <li>First item</li>\n  <li>Second item</li>\n</ul>"],["Quote","<blockquote>Your quote here.</blockquote>"],["Code","<code>inline code</code>"],["Block","<pre><code>// code block\nconst x = 1;</code></pre>"],["HR","<hr>"]].map(([l,s])=>(
                     <button key={l} type="button" onClick={()=>insertSnippet(s)}
                       style={{ padding:"3px 9px",background:"var(--surface-2)",border:"1px solid var(--border)",borderRadius:5,fontSize:11,fontWeight:600,cursor:"pointer",color:"var(--ink-mid)",fontFamily:"inherit",transition:"all 0.1s" }}
-                      onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="var(--primary-light)";el.style.borderColor="#6366f1";el.style.color="#6366f1"}}
+                      onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="var(--primary-light)";el.style.borderColor="#7C6CF6";el.style.color="#7C6CF6"}}
                       onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="var(--surface-2)";el.style.borderColor="var(--border)";el.style.color="var(--ink-mid)"}}>
                       {l}
                     </button>
@@ -647,7 +618,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
                   style={{ ...inp,resize:"vertical",lineHeight:1.75,fontFamily:"'Courier New',monospace",fontSize:13 }} />
                 {form.content&&(
                   <details style={{ marginTop:10 }}>
-                    <summary style={{ fontSize:12,color:"#6366f1",cursor:"pointer",fontWeight:600 }}>👁 Preview</summary>
+                    <summary style={{ fontSize:12,color:"#7C6CF6",cursor:"pointer",fontWeight:600 }}>👁 Preview</summary>
                     <div style={{ marginTop:10,padding:18,background:"var(--surface-2)",borderRadius:10,border:"1px solid var(--border)",fontSize:14,lineHeight:1.75,color:"var(--ink-mid)" }}
                       dangerouslySetInnerHTML={{ __html:form.content }} />
                   </details>
@@ -695,7 +666,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
                 <input value={form.keywords} onChange={e=>set("keywords",e.target.value)} placeholder="nextjs, fastapi, blogging" style={inp} />
                 <div style={{ display:"flex",gap:5,marginTop:6,flexWrap:"wrap" }}>
                   {form.keywords.split(",").filter(k=>k.trim()).map((k,i)=>(
-                    <span key={i} style={{ background:"var(--primary-light)",color:"#6366f1",fontSize:11,padding:"2px 8px",borderRadius:100,fontWeight:600 }}>{k.trim()}</span>
+                    <span key={i} style={{ background:"var(--primary-light)",color:"#7C6CF6",fontSize:11,padding:"2px 8px",borderRadius:100,fontWeight:600 }}>{k.trim()}</span>
                   ))}
                 </div>
               </div>
@@ -717,19 +688,19 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
                   {[["draft","📋","Draft"],["published","🚀","Published"],["archived","📦","Archived"]].map(([val,icon,label])=>(
                     <button key={val} onClick={()=>set("status",val)}
                       style={{ padding:"10px",borderRadius:10,border:"1.5px solid",cursor:"pointer",fontFamily:"inherit",textAlign:"center",transition:"all 0.13s",
-                        borderColor:form.status===val?"#6366f1":"var(--border)",background:form.status===val?"var(--primary-light)":"var(--card)" }}>
+                        borderColor:form.status===val?"#7C6CF6":"var(--border)",background:form.status===val?"var(--primary-light)":"var(--card)" }}>
                       <div style={{ fontSize:18,marginBottom:3 }}>{icon}</div>
-                      <div style={{ fontSize:12,fontWeight:700,color:form.status===val?"#6366f1":"#374151" }}>{label}</div>
+                      <div style={{ fontSize:12,fontWeight:700,color:form.status===val?"#7C6CF6":"#374151" }}>{label}</div>
                     </button>
                   ))}
                 </div>
               </div>
               <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
                 {[["featured","⭐ Featured","Shown in homepage featured section"],["editors_pick","✏️ Editor's Pick","Highlighted as hand-picked"]].map(([key,label,desc])=>(
-                  <label key={key} style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:10,border:`1.5px solid ${(form as any)[key]?"#6366f1":"var(--border)"}`,cursor:"pointer",background:(form as any)[key]?"var(--primary-light)":"var(--card)" }}>
-                    <input type="checkbox" checked={(form as any)[key]} onChange={e=>set(key,e.target.checked)} style={{ width:16,height:16,accentColor:"#6366f1" }} />
+                  <label key={key} style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:10,border:`1.5px solid ${(form as any)[key]?"#7C6CF6":"var(--border)"}`,cursor:"pointer",background:(form as any)[key]?"var(--primary-light)":"var(--card)" }}>
+                    <input type="checkbox" checked={(form as any)[key]} onChange={e=>set(key,e.target.checked)} style={{ width:16,height:16,accentColor:"#7C6CF6" }} />
                     <div>
-                      <div style={{ fontSize:13,fontWeight:700,color:(form as any)[key]?"#6366f1":"#374151" }}>{label}</div>
+                      <div style={{ fontSize:13,fontWeight:700,color:(form as any)[key]?"#7C6CF6":"#374151" }}>{label}</div>
                       <div style={{ fontSize:11,color:"var(--ink-light)" }}>{desc}</div>
                     </div>
                   </label>
@@ -746,7 +717,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
           <div style={{ background:"var(--card)",borderRadius:14,padding:18,border:"1px solid var(--border-light)" }}>
             <div style={{ fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.07em",color:"var(--ink-light)",marginBottom:12 }}>Publish</div>
             <button onClick={()=>handleSave(true)} disabled={saving}
-              style={{ width:"100%",padding:"11px",background:"#6366f1",color:"white",border:"none",borderRadius:10,fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit",marginBottom:8,boxShadow:"0 4px 12px rgba(99,102,241,0.3)" }}>
+              style={{ width:"100%",padding:"11px",background:"#7C6CF6",color:"white",border:"none",borderRadius:10,fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit",marginBottom:8,boxShadow:"0 4px 12px rgba(124,108,246,0.3)" }}>
               {saving?"Saving…":"🚀 Publish Now"}
             </button>
             <button onClick={()=>handleSave(false)} disabled={saving}
@@ -763,7 +734,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
                   <button key={c.value} onClick={()=>set("category_id",c.value)}
                     style={{ width:"100%",textAlign:"left",padding:"5px 9px",borderRadius:7,border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:form.category_id===c.value?700:400,marginBottom:1,transition:"all 0.1s",
                       background:form.category_id===c.value?"var(--primary-light)":"transparent",
-                      color:form.category_id===c.value?"#6366f1":"var(--ink-muted)" }}>
+                      color:form.category_id===c.value?"#7C6CF6":"var(--ink-muted)" }}>
                     {form.category_id===c.value?"● ":"○ "}{c.label}
                   </button>
                 ))}
@@ -780,7 +751,7 @@ function ArticleEditor({ existing, onSave, onCancel }: { existing?:Article|null;
                   : <div style={{ height:70,background:grad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20 }}>✍️</div>
                 }
                 <div style={{ padding:10 }}>
-                  <span style={{ fontSize:9,fontWeight:700,textTransform:"uppercase",color:"#6366f1",background:"var(--primary-light)",padding:"2px 6px",borderRadius:100 }}>{CATS.find(c=>c.value===form.category_id)?.label}</span>
+                  <span style={{ fontSize:9,fontWeight:700,textTransform:"uppercase",color:"#7C6CF6",background:"var(--primary-light)",padding:"2px 6px",borderRadius:100 }}>{CATS.find(c=>c.value===form.category_id)?.label}</span>
                   <div style={{ fontFamily:"'Playfair Display',serif",fontSize:13,fontWeight:700,color:"var(--ink)",marginTop:5,lineHeight:1.4 }}>{form.title}</div>
                   <div style={{ fontSize:11,color:"var(--ink-light)",marginTop:3,lineHeight:1.5,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden" }}>{form.excerpt||"Excerpt…"}</div>
                 </div>
@@ -812,10 +783,10 @@ function SEOManager({ articles }: { articles:Article[] }) {
       <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:26,fontWeight:700,color:"var(--ink)",marginBottom:6 }}>SEO Manager</h1>
       <p style={{ color:"var(--ink-light)",fontSize:13,marginBottom:24 }}>Monitor and improve your content's search visibility.</p>
       <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:24 }}>
-        <StatCard icon="🎯" value={`${score}%`} label="SEO Score" color="#6366f1" sub={score>=70?"Good":"Needs work"} />
+        <StatCard icon="🎯" value={`${score}%`} label="SEO Score" color="#7C6CF6" sub={score>=70?"Good":"Needs work"} />
         <StatCard icon="✅" value={good.length} label="Fully Optimised" color="#10b981" />
         <StatCard icon="⚠️" value={articles.length-good.length} label="Need Attention" color="#f59e0b" />
-        <StatCard icon="📝" value={articles.filter(a=>a.status==="published").length} label="Published" color="#14b8a6" />
+        <StatCard icon="📝" value={articles.filter(a=>a.status==="published").length} label="Published" color="#4D79F6" />
       </div>
       <div style={{ background:"var(--card)",borderRadius:14,border:"1px solid var(--border-light)",overflow:"hidden" }}>
         <div style={{ padding:"14px 20px",borderBottom:"1px solid var(--border-light)",fontWeight:700,fontSize:14,color:"var(--ink)" }}>Article SEO Status</div>
@@ -856,9 +827,9 @@ function Analytics({ articles }: { articles:Article[] }) {
       <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:26,fontWeight:700,color:"var(--ink)",marginBottom:6 }}>Analytics</h1>
       <p style={{ color:"var(--ink-light)",fontSize:13,marginBottom:24 }}>Track your content performance.</p>
       <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:24 }}>
-        <StatCard icon="👁️" value={totalViews.toLocaleString()} label="Total Views"  color="#6366f1" />
+        <StatCard icon="👁️" value={totalViews.toLocaleString()} label="Total Views"  color="#7C6CF6" />
         <StatCard icon="❤️" value={totalLikes.toLocaleString()} label="Total Likes"  color="#f43f5e" />
-        <StatCard icon="📝" value={articles.length}             label="Articles"     color="#14b8a6" />
+        <StatCard icon="📝" value={articles.length}             label="Articles"     color="#4D79F6" />
         <StatCard icon="📊" value={articles.length?Math.round(totalViews/articles.length):0} label="Avg Views" color="#f59e0b" />
       </div>
       <div style={{ display:"grid",gridTemplateColumns:"1.5fr 1fr",gap:20 }}>
@@ -869,10 +840,10 @@ function Analytics({ articles }: { articles:Article[] }) {
               <div key={a.id} style={{ padding:"11px 20px",borderBottom:"1px solid var(--border-light)" }}>
                 <div style={{ display:"flex",justifyContent:"space-between",marginBottom:4 }}>
                   <div style={{ fontSize:13,fontWeight:600,color:"var(--ink)",flex:1,minWidth:0,marginRight:10,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{i+1}. {a.title}</div>
-                  <span style={{ fontSize:12,fontWeight:700,color:"#6366f1",flexShrink:0 }}>{a.views.toLocaleString()}</span>
+                  <span style={{ fontSize:12,fontWeight:700,color:"#7C6CF6",flexShrink:0 }}>{a.views.toLocaleString()}</span>
                 </div>
                 <div style={{ height:4,background:"var(--surface-3)",borderRadius:2 }}>
-                  <div style={{ height:"100%",background:"linear-gradient(90deg,#6366f1,#14b8a6)",borderRadius:2,width:`${(a.views/maxV)*100}%` }} />
+                  <div style={{ height:"100%",background:"linear-gradient(90deg,#7C6CF6,#4D79F6)",borderRadius:2,width:`${(a.views/maxV)*100}%` }} />
                 </div>
               </div>
             ))}
@@ -886,7 +857,7 @@ function Analytics({ articles }: { articles:Article[] }) {
                   <div style={{ fontSize:13,fontWeight:600,color:"var(--ink)" }}>{c.label}</div>
                   <div style={{ fontSize:11,color:"var(--ink-light)" }}>{c.count} articles</div>
                 </div>
-                <span style={{ fontSize:13,fontWeight:700,color:"#6366f1" }}>{c.views.toLocaleString()}</span>
+                <span style={{ fontSize:13,fontWeight:700,color:"#7C6CF6" }}>{c.views.toLocaleString()}</span>
               </div>
             ))}
         </div>
@@ -906,7 +877,7 @@ function SettingsPanel() {
           <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:26,fontWeight:700,color:"var(--ink)" }}>Settings</h1>
           <p style={{ color:"var(--ink-light)",fontSize:13,marginTop:3 }}>Configure your blog settings</p>
         </div>
-        <button onClick={()=>setSaved(true)} style={{ background:saved?"#10b981":"#6366f1",color:"white",border:"none",borderRadius:10,padding:"9px 20px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit" }}>
+        <button onClick={()=>setSaved(true)} style={{ background:saved?"#10b981":"#7C6CF6",color:"white",border:"none",borderRadius:10,padding:"9px 20px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit" }}>
           {saved?"✅ Saved!":"Save Settings"}
         </button>
       </div>
@@ -929,17 +900,17 @@ function SettingsPanel() {
             </select>
           </div>
           {[["enableComments","💬 Enable Comments","Allow readers to comment"],["enableNewsletter","📬 Enable Newsletter","Show subscription forms"]].map(([key,label,desc])=>(
-            <label key={key} style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:10,border:`1.5px solid ${(s as any)[key]?"#6366f1":"var(--border)"}`,cursor:"pointer",background:(s as any)[key]?"var(--primary-light)":"var(--card)",marginBottom:10 }}>
-              <input type="checkbox" checked={(s as any)[key]} onChange={e=>setS(f=>({...f,[key]:e.target.checked}))} style={{ width:16,height:16,accentColor:"#6366f1" }} />
+            <label key={key} style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:10,border:`1.5px solid ${(s as any)[key]?"#7C6CF6":"var(--border)"}`,cursor:"pointer",background:(s as any)[key]?"var(--primary-light)":"var(--card)",marginBottom:10 }}>
+              <input type="checkbox" checked={(s as any)[key]} onChange={e=>setS(f=>({...f,[key]:e.target.checked}))} style={{ width:16,height:16,accentColor:"#7C6CF6" }} />
               <div>
-                <div style={{ fontSize:13,fontWeight:700,color:(s as any)[key]?"#6366f1":"#374151" }}>{label}</div>
+                <div style={{ fontSize:13,fontWeight:700,color:(s as any)[key]?"#7C6CF6":"#374151" }}>{label}</div>
                 <div style={{ fontSize:11,color:"var(--ink-light)" }}>{desc}</div>
               </div>
             </label>
           ))}
           <div style={{ background:"#fef3c7",borderRadius:10,padding:14,border:"1px solid #fde68a",marginTop:8 }}>
-            <div style={{ fontSize:12,fontWeight:700,color:"#92400e",marginBottom:4 }}>⚠️ Admin Password</div>
-            <div style={{ fontSize:12,color:"#92400e" }}>Change <code>NEXT_PUBLIC_ADMIN_UI_PASSWORD</code> in <code>frontend/.env</code> before production.</div>
+            <div style={{ fontSize:12,fontWeight:700,color:"#92400e",marginBottom:4 }}>⚠️ Admin Account</div>
+            <div style={{ fontSize:12,color:"#92400e" }}>The admin login comes from <code>ADMIN_EMAIL</code> and <code>ADMIN_PASSWORD</code> in <code>backend/.env</code>. Use a strong password before production.</div>
           </div>
         </div>
       </div>
@@ -955,10 +926,18 @@ export default function AdminPage() {
   const [editing, setEditing] = useState<Article|null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [notice,  setNotice]  = useState("");
+
   useEffect(() => {
-    const local = sessionStorage.getItem("admin_local");
-    const tok   = sessionStorage.getItem("access_token");
-    if (local==="true"||tok) { setAuthed(true); loadArticles(tok||""); }
+    sessionStorage.removeItem("admin_local");
+    const tok = sessionStorage.getItem("access_token");
+    if (!tok) return;
+    checkAdminToken(tok)
+      .then(problem => {
+        if (problem) { sessionStorage.removeItem("access_token"); setNotice(problem); return; }
+        setAuthed(true); loadArticles(tok);
+      })
+      .catch(() => setNotice(`Cannot connect to the backend at ${API}. Is it running?`));
   }, []);
 
   const loadArticles = async (tok:string) => {
@@ -974,7 +953,7 @@ export default function AdminPage() {
   };
 
   const handleLogin  = (tok:string) => { setAuthed(true); loadArticles(sessionStorage.getItem("access_token")||""); };
-  const handleLogout = () => { sessionStorage.removeItem("admin_local"); sessionStorage.removeItem("access_token"); setAuthed(false); };
+  const handleLogout = () => { sessionStorage.removeItem("access_token"); setNotice(""); setAuthed(false); };
   const handleDelete = async (id:string) => {
     const tok=sessionStorage.getItem("access_token")||"";
     const res=await fetch(`${API}/articles/${id}`,{ method:"DELETE",headers:{"Authorization":`Bearer ${tok}`} });
@@ -984,7 +963,7 @@ export default function AdminPage() {
   const handleNew   = () => { setEditing(null); setView("editor"); };
   const handleSaved = () => { loadArticles(sessionStorage.getItem("access_token")||""); setView("articles"); setEditing(null); };
 
-  if (!authed) return <AdminLogin onLogin={handleLogin} />;
+  if (!authed) return <AdminLogin key={notice} onLogin={handleLogin} notice={notice} />;
 
   return (
     <div style={{ fontFamily:"Lato,-apple-system,sans-serif",display:"flex",minHeight:"100vh",background:"var(--surface-2)" }}>
@@ -992,7 +971,7 @@ export default function AdminPage() {
       <main style={{ flex:1,marginLeft:220,padding:"32px 36px",minHeight:"100vh" }}>
         {loading?(
           <div style={{ display:"flex",alignItems:"center",justifyContent:"center",height:"50vh",flexDirection:"column",gap:12 }}>
-            <div style={{ width:36,height:36,border:"3px solid var(--border)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"spin 0.8s linear infinite" }} />
+            <div style={{ width:36,height:36,border:"3px solid var(--border)",borderTopColor:"#7C6CF6",borderRadius:"50%",animation:"spin 0.8s linear infinite" }} />
             <span style={{ color:"var(--ink-light)" }}>Loading…</span>
           </div>
         ):view==="dashboard"?<Dashboard articles={articles} onNew={handleNew} />

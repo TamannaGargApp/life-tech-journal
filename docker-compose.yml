@@ -52,6 +52,9 @@ services:
       # App
       - ENV=${ENV:-development}
       - SECRET_KEY=${SECRET_KEY}
+      # Admin account, created or promoted on startup
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
       # MongoDB — use Docker service name instead of localhost
       - MONGODB_URI=mongodb://mongodb:27017/life_tech_journal
       - MONGODB_DB=life_tech_journal

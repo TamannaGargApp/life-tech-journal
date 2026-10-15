@@ -8,6 +8,8 @@ import re, math, hashlib
 from datetime import datetime
 from app.models.article import Article, ArticleStatus
 from app.models.user import User, UserRole
+from app.core.config import settings
+from app.core.security import hash_password, verify_password
 
 
 AI_ARTICLE_SLUG = "how-ai-is-reshaping-the-world-and-peoples-lives"
@@ -338,6 +340,46 @@ YOUTH_ARTICLE_CONTENT = """
 """.strip()
 
 
+KHAMOSHI_POEM_SLUG = "khamoshi-taakat-ya-kamzori"
+
+KHAMOSHI_POEM_CONTENT = """
+<p>सब देखती हूँ, सब समझती हूँ,
+हर बात पर मगर जवाब नहीं देती हूँ।
+मेरी ख़ामोशी को मेरी हार मत समझना,
+मैं हर बात को ज़ुबाँ देना ज़रूरी नहीं समझती हूँ।</p>
+<p>लोग अक्सर मेरी चुप्पी को कमज़ोरी समझ बैठते हैं,
+मेरे सब्र को मेरी मजबूरी समझ बैठते हैं।
+फ़ायदा उठाते हैं मेरी ख़ामोशी का बार-बार,
+और ख़ुद को समझते हैं मुझसे ज़्यादा समझदार।</p>
+<p>पर उन्हें ये समझाना भी ज़रूरी नहीं समझती,
+कि हर ख़ामोशी के पीछे एक कहानी होती है।
+हर सहने वाले की कोई सीमा होती है,
+और हर चुप रहने वाले की भी एक ज़ुबानी होती है।</p>
+<p>मैं सब्र करती हूँ, हर बात सह जाती हूँ,
+रिश्तों की ख़ातिर कई बार ख़ुद को समझाती हूँ।
+मगर जब कोई हद से गुज़र जाता है,
+तो मेरे सब्र का बाँध भी टूट जाता है।</p>
+<p>फिर न शिकायत रहती है, न कोई सवाल,
+न उनके बदलने का इंतज़ार, न उनके होने का ख़याल।
+जो रिश्ता मेरी ख़ामोशी को समझ न सका,
+वो रिश्ता मेरे टूटे सब्र के बाद ठहर न सका।</p>
+<p>फिर फ़र्क नहीं पड़ता कि कौन क्या सोचता है,
+कौन मुझे ग़लत, कौन ख़ुद को सही समझता है।
+क्योंकि जिस दिन मैं ख़ामोशी तोड़ देती हूँ,
+उस दिन सिर्फ़ बोलना नहीं, रिश्ता भी छोड़ देती हूँ।</p>
+<p><strong>मेरी ख़ामोशी मेरी कमज़ोरी नहीं, मेरी ताक़त है,
+मेरे सब्र में छिपी मेरे आत्मसम्मान की इज़्ज़त है।
+ये मुझे लोगों के असली चेहरे दिखाती है,
+कौन अपना है, कौन पराया—बिन कहे समझाती है।</strong></p>
+<p>इसलिए मेरी चुप्पी को मेरी हार मत समझना,
+मेरे सब्र को मेरी लाचारी मत समझना।
+मैं ख़ामोश हूँ, तो बस अपने सुकून के लिए,
+वरना जवाब देना मुझे भी आता है…</p>
+<p><strong>बस हर किसी को उसकी औक़ात बताना
+मैं ज़रूरी नहीं समझती।</strong></p>
+""".strip()
+
+
 SEED_ARTICLES = [
     dict(
         title="How AI is reshaping the world and people's lives",
@@ -365,6 +407,19 @@ SEED_ARTICLES = [
         meta_description="Young people have ideas, creativity and technology on their side. What turns that power into change is execution and determination.",
         keywords=["youth", "change the world", "motivation", "execution", "determination", "soft power"],
     ),
+    dict(
+        title="खामोशी — ताकत या कमज़ोरी?",
+        slug=KHAMOSHI_POEM_SLUG,
+        featured_image="/images/articles/khamoshi-hero.jpg",
+        excerpt="मेरी ख़ामोशी मेरी कमज़ोरी नहीं, मेरी ताक़त है।",
+        content=KHAMOSHI_POEM_CONTENT,
+        category_id="poems",
+        featured=False,
+        editors_pick=False,
+        meta_title="खामोशी — ताकत या कमज़ोरी? | हिंदी कविता",
+        meta_description="ख़ामोशी कमज़ोरी नहीं, ताक़त है: सब्र, आत्मसम्मान और रिश्तों पर एक हिंदी कविता।",
+        keywords=["hindi poem", "हिंदी कविता", "khamoshi", "ख़ामोशी", "self respect", "poems"],
+    ),
 ]
 
 
@@ -376,8 +431,46 @@ PREVIOUS_SEED_HASHES = {
 }
 
 
+# Header images we seeded earlier and later replaced; an article still using one gets the new image.
+OLD_SEED_IMAGES = {"/images/articles/khamoshi-hero.svg"}
+
+
 def _hash(text: str) -> str:
     return hashlib.sha256((text or "").strip().encode()).hexdigest()
+
+
+async def seed_admin() -> None:
+    """Make sure the account in ADMIN_EMAIL / ADMIN_PASSWORD exists and is an admin."""
+    email = settings.ADMIN_EMAIL.strip()
+    password = settings.ADMIN_PASSWORD
+    if not email or not password:
+        print("ℹ️  ADMIN_EMAIL / ADMIN_PASSWORD not set; no admin account seeded.")
+        return
+    user = await User.find_one(User.email == email)
+    if not user:
+        await User(
+            name=settings.ADMIN_NAME, email=email,
+            password_hash=hash_password(password),
+            role=UserRole.admin, is_verified=True,
+        ).insert()
+        print(f"✅ Admin account created: {email}")
+        return
+    changed = False
+    if user.role != UserRole.admin:
+        user.role = UserRole.admin
+        changed = True
+    if not user.password_hash or not verify_password(password, user.password_hash):
+        user.password_hash = hash_password(password)
+        changed = True
+    if not user.is_verified:
+        user.is_verified = True
+        changed = True
+    if changed:
+        user.updated_at = datetime.utcnow()
+        await user.save()
+        print(f"✅ Admin account updated: {email}")
+    else:
+        print(f"✅ Admin account ready: {email}")
 
 
 async def seed_articles() -> None:
@@ -390,7 +483,7 @@ async def seed_articles() -> None:
                 existing.content = data["content"]
                 existing.read_time = _read_time(data["content"])
                 changed = True
-            if not existing.featured_image and data.get("featured_image"):
+            if data.get("featured_image") and (not existing.featured_image or existing.featured_image in OLD_SEED_IMAGES):
                 existing.featured_image = data["featured_image"]
                 changed = True
             if changed:

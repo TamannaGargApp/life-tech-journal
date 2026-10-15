@@ -126,16 +126,18 @@ ALLOWED_HOSTS=*
 
 # Frontend
 NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
-NEXT_PUBLIC_ADMIN_UI_PASSWORD=your-admin-ui-password
-NEXT_PUBLIC_ADMIN_EMAIL=admin@yourdomain.com
-NEXT_PUBLIC_ADMIN_PASSWORD=your-admin-account-password
+
+# Admin account (backend)
+ADMIN_EMAIL=admin@yourdomain.com
+ADMIN_PASSWORD=choose-a-strong-password
 ```
 
 ### 3. Configure admin access
 
-Set the admin values in `frontend/.env`. The admin page reads
-`NEXT_PUBLIC_ADMIN_UI_PASSWORD`, `NEXT_PUBLIC_ADMIN_EMAIL`, and
-`NEXT_PUBLIC_ADMIN_PASSWORD` from that file.
+Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `backend/.env` (or the root `.env`).
+When the backend starts it creates that account as an admin, or promotes it if it
+already exists, and resets its password to `ADMIN_PASSWORD`. Then sign in at
+`/admin` with that email and password.
 
 ### 4. Run
 

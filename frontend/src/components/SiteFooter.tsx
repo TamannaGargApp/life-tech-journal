@@ -2,6 +2,15 @@
 import Link from "next/link";
 import SiteLogo from "@/components/SiteLogo";
 
+const SOCIALS = [
+  { key: "instagram", label: "Instagram", href: "https://www.instagram.com/lifetechjournal",
+    icon: <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> },
+  { key: "youtube", label: "YouTube", href: "https://www.youtube.com/@LifeTechJournal",
+    icon: <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden><rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg> },
+  { key: "gallery", label: "Gallery", href: "/gallery",
+    icon: <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg> },
+];
+
 export default function SiteFooter() {
   const cols = [
     { title: "Life", links: [
@@ -43,13 +52,16 @@ export default function SiteFooter() {
               Stories That Inspire. Technology That Empowers. Published weekly for curious minds.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
-              {["𝕏", "in", "📸", "▶"].map(icon => (
-                <span key={icon} style={{ width: 36, height: 36, borderRadius: 9, border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-light)", fontSize: 13, cursor: "pointer", transition: "all 0.15s" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.color = "var(--ink-light)"; }}>
-                  {icon}
-                </span>
-              ))}
+              {SOCIALS.map(s => {
+                const external = s.href.startsWith("http");
+                return (
+                  <a key={s.label} href={s.href} aria-label={s.label} title={s.label}
+                    className={`footer-social is-${s.key}`}
+                    {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>
+                    {s.icon}
+                  </a>
+                );
+              })}
             </div>
           </div>
           {cols.map(col => (
@@ -78,9 +90,9 @@ export default function SiteFooter() {
             <input type="email" placeholder="your@email.com"
               style={{ padding: "9px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--card)", color: "var(--ink)", fontSize: 13, outline: "none", fontFamily: "inherit", width: 210 }} />
             <button
-              style={{ padding: "9px 18px", background: "#4F46E5", color: "white", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#3730A3"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#4F46E5"; }}>
+              style={{ padding: "9px 18px", background: "#6C63F2", color: "white", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#5048D8"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#6C63F2"; }}>
               Subscribe →
             </button>
           </div>

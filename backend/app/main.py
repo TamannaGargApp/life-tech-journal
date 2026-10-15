@@ -8,12 +8,16 @@ from app.core.redis import connect_redis, disconnect_redis
 from app.api.v1.router import api_router
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.audit import AuditMiddleware
-from app.seed import seed_articles
+from app.seed import seed_admin, seed_articles
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db()
+    try:
+        await seed_admin()
+    except Exception as e:
+        print(f"⚠️  Admin seeding skipped: {e}")
     try:
         await seed_articles()
     except Exception as e:

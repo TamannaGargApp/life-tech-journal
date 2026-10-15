@@ -1,6 +1,7 @@
 """
 Authentication endpoints — email + Google OAuth
 """
+import re
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -41,10 +42,19 @@ async def register(body: RegisterRequest):
     return {"message": "Account created successfully. You can now sign in."}
 
 
+async def _find_user_by_email(email: str) -> Optional[User]:
+    """Exact match first, then a case-insensitive match so "Name@Mail.com" still signs in."""
+    email = email.strip()
+    user = await User.find_one(User.email == email)
+    if not user:
+        user = await User.find_one({"email": {"$regex": f"^{re.escape(email)}$", "$options": "i"}})
+    return user
+
+
 # ── Email Login ───────────────────────────────────────────────────────────────
 @router.post("/login", response_model=TokenResponse)
 async def login(body: LoginRequest, response: Response):
-    user = await User.find_one(User.email == body.email)
+    user = await _find_user_by_email(body.email)
     if not user or not user.password_hash:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     if not verify_password(body.password, user.password_hash):

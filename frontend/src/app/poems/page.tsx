@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteNavbar from "@/components/SiteNavbar";
 import SiteFooter from "@/components/SiteFooter";
+import { withAiArticle } from "@/data/aiArticle";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 const PAGE_SIZE = 9;
@@ -19,8 +20,12 @@ export default function PoemsPage() {
     setLoading(true);
     fetch(`${API}/articles?category=poems&sort=latest&size=${PAGE_SIZE}&page=${page}`)
       .then(r => r.json())
-      .then(d => { setPoems(p => page === 1 ? (d.items ?? []) : [...p, ...(d.items ?? [])]); setTotal(d.total ?? 0); })
-      .catch(() => {})
+      .then(d => {
+        const items = d.items ?? [];
+        setPoems(p => page === 1 ? withAiArticle(items, { category: "poems" }) : [...p, ...items]);
+        setTotal(d.total ?? 0);
+      })
+      .catch(() => { if (page === 1) setPoems(withAiArticle([], { category: "poems" })); })
       .finally(() => setLoading(false));
   }, [page]);
 
